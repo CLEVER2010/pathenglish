@@ -3,72 +3,144 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function LandingPage() {
+  const [activeTab, setActiveTab] = useState<string>("all");
+
   return (
-    <main className="min-h-screen bg-[#0f172a] text-white font-sans selection:bg-emerald-500/30">
-      {/* Header */}
-      <nav className="border-b border-white/5 p-6 flex justify-between items-center max-w-7xl mx-auto">
-        <div className="text-xl font-black tracking-tighter">ELITE<span className="text-emerald-500">ACADEMY</span></div>
-        <div className="space-x-6 text-sm text-gray-400 font-medium">
-          <Link href="#" className="hover:text-emerald-400">Kurslar</Link>
-          <Link href="#" className="hover:text-emerald-400">İmtahanlar</Link>
-          <Link href="/exam" className="px-4 py-2 bg-white/5 rounded-xl hover:bg-white/10 transition">Giriş</Link>
+    <main className="min-h-screen bg-[#0b0f19] text-slate-100 font-sans selection:bg-emerald-500/30">
+      
+      {/* Top Professional Header */}
+      <nav className="border-b border-slate-800 bg-[#0b0f19]/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <span className="text-xl font-black tracking-wider text-white">ELITE<span className="text-emerald-500">ACADEMY</span></span>
+            <span className="hidden md:inline-block px-2.5 py-1 rounded bg-slate-800 text-slate-300 text-[10px] font-semibold uppercase">CEFR Standard</span>
+          </div>
+          
+          <div className="flex items-center space-x-6 text-sm font-medium text-slate-300">
+            <Link href="/exam" className="hover:text-emerald-400 transition">Kurslar</Link>
+            <Link href="/exam" className="hover:text-emerald-400 transition">İmtahanlar</Link>
+            <Link href="/exam" className="hover:text-emerald-400 transition">Səviyyə Təyini</Link>
+            <Link 
+              href="/exam" 
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl transition font-bold shadow-lg shadow-emerald-900/20"
+            >
+              Daxil Ol / Qeydiyyat
+            </Link>
+          </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-6 py-20 text-center">
-        <div className="inline-flex items-center space-x-2 bg-white/5 border border-white/5 rounded-full px-4 py-1.5 mb-8">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="text-xs uppercase tracking-widest text-gray-300">Yeni Mövsüm Qeydiyyatı Başladı</span>
+      {/* Hero Section - Professional & Clean */}
+      <section className="max-w-5xl mx-auto px-6 pt-16 pb-12 text-center space-y-6">
+        <div className="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span className="text-xs uppercase tracking-widest text-emerald-400 font-bold">2026 Akademik Proqramı Aktivdir</span>
         </div>
         
-        <h1 className="text-6xl md:text-8xl font-black leading-tight mb-8">
-          İngilis Dilini <br /> 
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">
-            60 Güne Mənimsəyin
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">
+          Beynəlxalq Standartlarla <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
+            İngilis Dilini Mənimsəyin
           </span>
         </h1>
         
-        <p className="text-gray-400 text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
-          Dil öyrənə bilməməyin səbəbi istedadsızlıq deyil – istiqamətsizlikdir. 
-          Akademik sistemimizlə A1-dən C2-yə addım-addım yüksəlin.
+        <p className="text-slate-400 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+          Dil öyrənə bilməməyin səbəbi istedadsızlıq deyil – yanlış istiqamətdir. 
+          A1 səviyyəsindən C2 səviyyəsinə qədər sınaqdan keçmiş sistemli kurikulum.
         </p>
 
-        <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+        {/* Working Action Buttons */}
+        <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
           <Link 
             href="/exam" 
-            className="px-10 py-4 bg-emerald-600 hover:bg-emerald-500 transition-all rounded-2xl font-black text-lg shadow-[0_0_40px_-10px_rgba(16,185,129,0.5)]"
+            className="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-sm transition shadow-xl shadow-emerald-900/30 flex items-center space-x-2"
           >
-            Sistemə Giriş Et 🚀
+            <span>Məcburi Səviyyə İmtahanı</span>
+            <span>→</span>
           </Link>
-          <button className="px-10 py-4 bg-white/5 hover:bg-white/10 transition rounded-2xl font-bold text-lg">
-            Proqramı İncele
-          </button>
+          <Link 
+            href="/exam" 
+            className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-bold text-sm transition"
+          >
+            Proqramı İncelə və Başla
+          </Link>
         </div>
       </section>
 
-      {/* Grid Features */}
-      <section className="max-w-7xl mx-auto px-6 pb-20 grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { title: "Reading", desc: "60 günlük sistemli təqvim, seçilmiş akademik mətnlər və çətin söz bazası.", icon: "📚" },
-          { title: "Listening", desc: "Hər günə uyğun real audio materiallar və IELTS standartlarına uyğun tapşırıqlar.", icon: "🎧" },
-          { title: "Sertifikasiya", desc: "Kursu bitirdikdən sonra səviyyəni rəsmi təsdiqləyən yekun imtahan.", icon: "🎓" },
-          { title: "Grammar", desc: "Quru qaydalardan uzaq, praktik tətbiq olunan qrammatik strukturlar.", icon: "✍️" },
-          { title: "Vocabulary", desc: "Akademik və gündəlik istifadə üçün 3000+ vacib söz.", icon: "💎" },
-          { title: "Leaderboard", desc: "Digər tələbələrlə yarışın, aylıq nəticələrlə sertifikat qazanın.", icon: "🏆" }
-        ].map((item, i) => (
-          <div key={i} className="p-8 bg-slate-900/50 border border-white/5 rounded-3xl hover:border-emerald-500/30 transition-all group">
-            <div className="text-4xl mb-4">{item.icon}</div>
-            <h3 className="text-xl font-bold mb-2 group-hover:text-emerald-400 transition">{item.title}</h3>
-            <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
+      {/* Interactive Level Navigation Cards */}
+      <section className="max-w-7xl mx-auto px-6 py-12">
+        <div className="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
+          <h3 className="text-lg font-bold text-white">Səviyyələr Üzrə Tədris Modulları</h3>
+          <span className="text-xs text-slate-400">CEFR Çərçivəsi (A1 - C2)</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          {/* Reading Card */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/50 transition group">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold mb-4 text-lg">📚</div>
+            <h4 className="text-lg font-bold text-white mb-2 group-hover:text-emerald-400 transition">Reading (Oxuma)</h4>
+            <p className="text-xs text-slate-400 mb-6 leading-relaxed">
+              60 günlük sistemli təqvim, akademik mətnlər, çətin söz bazası və 10 suallıq testlər.
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((lvl) => (
+                <Link
+                  key={lvl}
+                  href={`/reading/${lvl.toLowerCase()}`}
+                  className="py-2 text-center text-xs font-bold bg-slate-800 hover:bg-emerald-600 hover:text-white rounded-lg transition text-slate-300 border border-slate-700/50"
+                >
+                  {lvl}
+                </Link>
+              ))}
+            </div>
           </div>
-        ))}
+
+          {/* Listening Card */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/50 transition group">
+            <div className="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center font-bold mb-4 text-lg">🎧</div>
+            <h4 className="text-lg font-bold text-white mb-2 group-hover:text-teal-400 transition">Listening (Dinləmə)</h4>
+            <p className="text-xs text-slate-400 mb-6 leading-relaxed">
+              Real audio materiallar, IELTS standartlarına uyğun transkripsiya və dinləmə testləri.
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((lvl) => (
+                <Link
+                  key={lvl}
+                  href={`/exam`}
+                  className="py-2 text-center text-xs font-bold bg-slate-800 hover:bg-teal-600 hover:text-white rounded-lg transition text-slate-300 border border-slate-700/50"
+                >
+                  {lvl}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Exam & Certification Card */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/50 transition group flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold mb-4 text-lg">🎓</div>
+              <h4 className="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition">Yekun İmtahan Mərkəzi</h4>
+              <p className="text-xs text-slate-400 mb-6 leading-relaxed">
+                30 dəqiqəlik yerləşdirmə imtahanı, qlobal reytinq cədvəli (Leaderboard) və rəsmi səviyyə təyini.
+              </p>
+            </div>
+            <Link
+              href="/exam"
+              className="w-full py-3 text-center text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white rounded-xl transition shadow-md"
+            >
+              İmtahana Keçid Et 🚀
+            </Link>
+          </div>
+
+        </div>
       </section>
 
-      {/* Footer info */}
-      <footer className="py-10 border-t border-white/5 text-center text-sm text-gray-500">
-        © 2026 Elite Language Academy. Bütün hüquqlar qorunur.
+      {/* Footer */}
+      <footer className="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
+        <p>© 2026 Elite Language Academy. Bütün hüquqlar qorunur.</p>
       </footer>
+
     </main>
   );
 }
