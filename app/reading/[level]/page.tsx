@@ -1,9 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import ProgressCalendar from "../../components/ProgressCalendar";
-export default function ReadingLevelPage({ params }: { params: { level: string } }) {
-  const level = params.level.toUpperCase();
+
+export default function ReadingLevelPage({ params }: { params: Promise<{ level: string }> }) {
+  const resolvedParams = use(params);
+  const level = resolvedParams.level.toUpperCase();
+  
   const [activeDay, setActiveDay] = useState<number>(1);
   const [completedDays, setCompletedDays] = useState<number[]>([]);
   
@@ -41,7 +44,7 @@ export default function ReadingLevelPage({ params }: { params: { level: string }
           "B) Passive memorization and rules",
           "C) Temporary short-term studying"
         ],
-        correct: 0 // Düzgün cavab həmişə A variantıdır (0)
+        correct: 0 
       }))
     };
   };
