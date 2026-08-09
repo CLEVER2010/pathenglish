@@ -1,10 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import ProgressCalendar from "../../components/ProgressCalendar";
 
-export default function ListeningLevelPage({ params }: { params: { level: string } }) {
-  const level = params.level.toUpperCase();
+export default function ListeningLevelPage({ params }: { params: Promise<{ level: string }> }) {
+  const resolvedParams = use(params);
+  const level = resolvedParams.level.toUpperCase();
+  
   const [activeDay, setActiveDay] = useState<number>(1);
   const [completedDays, setCompletedDays] = useState<number[]>([]);
   
@@ -12,6 +14,7 @@ export default function ListeningLevelPage({ params }: { params: { level: string
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
 
+  // LocalStorage-dən əvvəlki irəliləyişi oxumaq
   useEffect(() => {
     const saved = localStorage.getItem(`listening_${level}_progress`);
     if (saved) {
@@ -23,28 +26,30 @@ export default function ListeningLevelPage({ params }: { params: { level: string
     }
   }, [level]);
 
-  // Hər gün üçün fərqli Listening mövzuları və audio simulyasiyası
-  const getListeningData = (day: number) => {
-    const topics = ["Education & Future", "Technology & AI", "Business & Economy", "Health & Lifestyle", "Global Science"];
-    const topic = topics[(day - 1) % topics.length];
-
+  // Hər gün üçün dinləmə materialı və 10 suallıq test bazası
+  const getDayContent = (day: number) => {
     return {
-      title: `Dinləmə Günü ${day}: ${topic}`,
-      audioScript: `Audio Transcript (Day ${day}): Welcome to day ${day} listening session. In this session focusing on ${topic}, native speakers discuss key challenges and modern developments. Listen carefully to the tone, speed, and structural expressions used throughout the dialogue.`,
+      title: `Gün ${day}: ${day === 1 ? "Listening Comprehension & Native Accent" : day === 2 ? "Audio Strategies & Fast Speech" : `Advanced Listening for ${level}`}`,
+      audioDescription: `Audio Track ${day}: Dinləmə zamanı natiqin vurğularına, intonasiyasına və sürətli danışıq modellərinə diqqət yetirin. Bu ${level} səviyyəli audio material qulaq dolğunluğu yaratmaq üçün xüsusi seçilmişdir.`,
+      vocabulary: [
+        { term: "Intonation", def: "İntonasiya (rise and fall of voice)." },
+        { term: "Comprehension", def: "Anlama, dərketmə (ability to understand)." },
+        { term: "Accent", def: "Aksent, tələffüz tərzi (distinctive mode of pronunciation)." }
+      ],
       questions: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
-        question: `[Listening G${day}] Sual ${i + 1}: Dinlənilən mətndə əsas müzakirə obyekti nədir?`,
+        question: `[Dinləmə Gün ${day}] Sual ${i + 1}: Audio parça əsasında natiqin əsas mesajı nə idi?`,
         options: [
-          `A) Modern aspects of ${topic}`,
-          "B) Historical background only",
-          "C) Irrelevant daily routines"
+          "A) Developing sharp listening skills and focus",
+          "B) Ignoring native accents and speed",
+          "C) Memorizing words without listening"
         ],
-        correct: 0
+        correct: 0 
       }))
     };
   };
 
-  const currentData = getListeningData(activeDay);
+  const currentData = getDayContent(activeDay);
 
   const handleOptionSelect = (qId: number, optIndex: number) => {
     if (isSubmitted) return;
@@ -80,7 +85,7 @@ export default function ListeningLevelPage({ params }: { params: { level: string
       <div className="max-w-7xl mx-auto space-y-12">
         
         <div className="flex justify-between items-center bg-slate-900 p-6 rounded-3xl border border-white/10 shadow-xl">
-          <Link href="/" className="text-purple-400 font-bold hover:underline text-sm">← Ana Səhifə</Link>
+          <Link href="/" className="text-blue-400 font-bold hover:underline text-sm">← Ana Səhifə</Link>
           <h1 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">
             {level} Səviyyəsi • Listening Modulu
           </h1>
@@ -103,7 +108,6 @@ export default function ListeningLevelPage({ params }: { params: { level: string
 
           <div className="lg:col-span-2 space-y-8">
             
-            {/* Audio Pleyer Simulyasiyası */}
             <div className="p-8 bg-slate-900 rounded-3xl border border-white/10 space-y-6 shadow-2xl">
               <div className="flex justify-between items-center border-b border-white/10 pb-4">
                 <h2 className="text-xl md:text-2xl font-black text-white">{currentData.title}</h2>
@@ -112,37 +116,40 @@ export default function ListeningLevelPage({ params }: { params: { level: string
                 </span>
               </div>
               
-              {/* Audio Pleyer UI */}
-              <div className="bg-slate-950 p-6 rounded-2xl border border-white/5 space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-xl shadow-lg shadow-purple-500/30">
-                    🎧
+              {/* Audio Player Simulyasiyası */}
+              <div className="bg-slate-950 p-6 rounded-2xl border border-white/10 space-y-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center font-bold text-lg shadow-lg">
+                    ▶
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold">Audio Track • {level} Gün {activeDay}</h4>
-                    <p className="text-xs text-gray-400">Native Speaker Audio (Real-time simulation)</p>
+                    <h4 className="text-sm font-bold text-white">Audio Materialı Dinlə</h4>
+                    <p className="text-xs text-gray-400">Təbii sürət və ingilis dili vurğusu</p>
                   </div>
                 </div>
-                
                 <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                  <div className="bg-purple-500 w-1/3 h-full"></div>
+                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 w-1/3 h-full"></div>
                 </div>
+                <p className="text-gray-300 text-xs md:text-sm italic">{currentData.audioDescription}</p>
               </div>
 
-              {/* Transcript */}
-              <div className="space-y-2">
-                <h3 className="text-xs font-extrabold text-purple-400 uppercase tracking-wider">Audio Transcript (Mətn):</h3>
-                <p className="text-gray-300 text-sm leading-relaxed bg-slate-950/40 p-4 rounded-xl border border-white/5">
-                  {currentData.audioScript}
-                </p>
+              <div className="bg-slate-950/60 p-6 rounded-2xl border border-white/5 space-y-3">
+                <h3 className="text-xs font-extrabold text-pink-400 uppercase tracking-wider">Listening Keywords:</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {currentData.vocabulary.map((vocab, idx) => (
+                    <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 text-xs space-y-1">
+                      <strong className="text-white block">{vocab.term}</strong>
+                      <span className="text-gray-400 text-[11px]">{vocab.def}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Test Modulu */}
             <div className="p-8 bg-slate-900 rounded-3xl border border-white/10 space-y-8 shadow-2xl">
               <div className="border-b border-white/10 pb-4">
-                <h3 className="text-xl font-bold">Dinləmə Anlama Testi (10 Sual)</h3>
-                <p className="text-xs text-gray-400 mt-1">Dinlədiyinə əsasən sualları cavablandır və növbəti günü aç.</p>
+                <h3 className="text-xl font-bold">Dinləmə Üzrə 10 Suallıq Test</h3>
+                <p className="text-xs text-gray-400 mt-1">Növbəti günə keçmək üçün ən azı 7 düzgün cavab yığmalısan.</p>
               </div>
 
               <div className="space-y-6">
@@ -179,7 +186,7 @@ export default function ListeningLevelPage({ params }: { params: { level: string
                   onClick={handleSubmitTest}
                   className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-black text-sm hover:opacity-90 transition shadow-xl"
                 >
-                  Dinləmə Nəticəsini Yoxla
+                  Dinləmə Cavablarını Yoxla
                 </button>
               ) : (
                 <div className="p-6 bg-slate-950 rounded-2xl border border-white/10 text-center space-y-4">
@@ -188,15 +195,15 @@ export default function ListeningLevelPage({ params }: { params: { level: string
                   </p>
                   <p className="text-xs text-gray-400">
                     {score >= 7 
-                      ? "🎉 Təbriklər! Dinləmə günü uğurla tamamlandı." 
-                      : "⚠️ 7-dən az düzgün cavab yığdığın üçün gün tamamlanmadı."}
+                      ? "🎉 Təbriklər! Dinləmə gününü uğurla tamamladın və növbəti günün kilidi açıldı." 
+                      : "⚠️ 7-dən az yığdığın üçün dinləmə günü tamamlanmadı. Yenidən cəhd edə bilərsən."}
                   </p>
                   {score >= 7 && activeDay < 60 && (
                     <button
                       onClick={handleNextDay}
                       className="px-6 py-3 rounded-xl bg-green-600 text-white font-bold text-xs hover:bg-green-500 transition shadow-lg"
                     >
-                      Növbəti Günə Keç (Gün {activeDay + 1}) →
+                      Növbəti Dinləmə Gününə Keç (Gün {activeDay + 1}) →
                     </button>
                   )}
                 </div>
