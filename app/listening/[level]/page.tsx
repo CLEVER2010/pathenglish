@@ -1,191 +1,231 @@
 "use client";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useRef } from "react";
 import Link from "next/link";
 import ProgressCalendar from "../../components/ProgressCalendar";
 
 export default function ListeningLevelPage({ params }: { params: Promise<{ level: string }> }) {
   const resolvedParams = use(params);
-  const level = resolvedParams.level.toUpperCase();
+  const rawLevel = resolvedParams.level.toUpperCase();
+  const isSpecialExam = rawLevel === "SAT" || rawLevel === "IELTS";
+  const level = isSpecialExam ? rawLevel : rawLevel;
   
   const [activeDay, setActiveDay] = useState<number>(1);
   const [completedDays, setCompletedDays] = useState<number[]>([]);
-  
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [showTranscript, setShowTranscript] = useState<boolean>(false); // Aç/Bağla düyməsi üçün state
+  const [showTranscript, setShowTranscript] = useState<boolean>(false);
 
-  const handlePlayAudio = (text: string) => {
-    if (!('speechSynthesis' in window)) {
-      alert("Speech synthesis is not supported in this browser.");
-      return;
-    }
-    window.speechSynthesis.cancel();
-    if (isPlaying) {
-      setIsPlaying(false);
-      return;
-    }
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = level === 'A1' || level === 'A2' ? 0.8 : 0.95;
-    utterance.onend = () => setIsPlaying(false);
-    utterance.onerror = () => setIsPlaying(false);
-    
-    setIsPlaying(true);
-    window.speechSynthesis.speak(utterance);
-  };
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(180);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem(`listening_${level}_progress`);
     if (saved) {
-      try {
-        setCompletedDays(JSON.parse(saved));
-      } catch (e) {
-        console.error(e);
-      }
+      try { setCompletedDays(JSON.parse(saved)); } catch (e) { console.error(e); }
     }
     return () => {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [level]);
 
-  // Hər səviyyəyə uyğun xüsusi dinləmə scriptləri və sualları
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins < 10 ? "0" : ""}${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
+  const handlePlayAudio = (scriptText: string) => {
+    if (!('speechSynthesis' in window)) { alert("Speech synthesis not supported."); return; }
+    if (isPlaying) {
+      window.speechSynthesis.cancel();
+      setIsPlaying(false);
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(scriptText);
+    utterance.lang = 'en-US';
+    utterance.rate = level === 'A1' || level === 'A2' ? 0.85 : 0.95;
+
+    const estimatedDuration = Math.max(120, Math.floor(scriptText.length / 14));
+    setDuration(estimatedDuration);
+    setCurrentTime(0);
+
+    utterance.onstart = () => {
+      setIsPlaying(true);
+      if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = setInterval(() => {
+        setCurrentTime((prev) => {
+          if (prev >= estimatedDuration) {
+            if (timerRef.current) clearInterval(timerRef.current);
+            return estimatedDuration;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    };
+
+    utterance.onend = () => { setIsPlaying(false); if (timerRef.current) clearInterval(timerRef.current); setCurrentTime(estimatedDuration); };
+    utterance.onerror = () => { setIsPlaying(false); if (timerRef.current) clearInterval(timerRef.current); };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => { setCurrentTime(Number(e.target.value)); };
+
   const getDayContent = (lvl: string, day: number) => {
     switch (lvl) {
       case "A1":
         return {
-          title: `Day ${day}: Listening to Basic Conversations`,
-          audioScript: `Hello, my name is David. I live in a small house with my cat and dog. Every morning, I drink a cup of coffee and eat a piece of toast. Today, I am going to the supermarket to buy milk, apples, and fresh bread. The weather is sunny and warm, so I will walk there instead of taking the bus.`,
+          title: `Day ${day}: Basic Daily Conversations`,
+          audioScript: `Hello everyone. My name is Mark. Every morning, I wake up at seven o'clock. I wash my face, brush my teeth, and prepare a simple breakfast consisting of eggs, toast, and hot black tea. After breakfast, I walk to the nearby grocery store to buy fresh fruits, vegetables, and milk for my family.`,
           vocabulary: [
-            { term: "Supermarket", def: "A large self-service store selling foods and household goods." },
-            { term: "Toast", def: "Sliced bread browned by exposure to radiant heat." },
-            { term: "Instead", def: "As an alternative or substitute." }
+            { term: "Grocery", def: "A store selling food." },
+            { term: "Chore", def: "A routine task." }
           ],
           questions: [
-            { id: 1, question: "What is the speaker's name?", options: ["A) John", "B) David", "C) Alex"], correct: 1 },
-            { id: 2, question: "What pets does David have?", options: ["A) A cat and a dog", "B) Only a parrot", "C) Two rabbits"], correct: 0 },
-            { id: 3, question: "What does David drink every morning?", options: ["A) Tea", "B) Juice", "C) Coffee"], correct: 2 },
-            { id: 4, question: "Where is David going today?", options: ["A) To the park", "B) To the supermarket", "C) To the cinema"], correct: 1 },
-            { id: 5, question: "What items is he going to buy?", options: ["A) Milk, apples, and bread", "B) Meat and fish", "C) Books and pens"], correct: 0 },
-            { id: 6, question: "How is the weather today?", options: ["A) Rainy and cold", "B) Sunny and warm", "C) Snowy"], correct: 1 },
-            { id: 7, question: "How will David travel to the supermarket?", options: ["A) By bus", "B) By taxi", "C) On foot (walk)"], correct: 2 },
-            { id: 8, question: "What does 'Supermarket' mean?", options: ["A) A small fruit shop", "B) A large store selling foods", "C) A clothing market"], correct: 1 },
-            { id: 9, question: "What does 'Instead' mean?", options: ["A) As an alternative", "B) Together with", "C) Always late"], correct: 0 },
-            { id: 10, question: "What did he eat with his coffee?", options: ["A) Toast", "B) Cake", "C) Salad"], correct: 0 }
+            { id: 1, question: "What time does Mark wake up?", options: ["A) 6:00 AM", "B) 7:00 AM", "C) 8:00 AM"], correct: 1 },
+            { id: 2, question: "What does he drink for breakfast?", options: ["A) Juice", "B) Black tea", "C) Coffee"], correct: 1 },
+            { id: 3, question: "Where does he walk after breakfast?", options: ["A) Grocery store", "B) Station", "C) Office"], correct: 0 },
+            { id: 4, question: "What items does he buy?", options: ["A) Books", "B) Fruits, vegetables, and milk", "C) Meat"], correct: 1 },
+            { id: 5, question: "How is the weather?", options: ["A) Rainy", "B) Bright and sunny", "C) Windy"], correct: 1 },
+            { id: 6, question: "Where does he walk?", options: ["A) Park", "B) Mountain", "C) Beach"], correct: 0 },
+            { id: 7, question: "What does 'Grocery' mean?", options: ["A) Clothing shop", "B) Food store", "C) Repair shop"], correct: 1 },
+            { id: 8, question: "Who does he buy milk for?", options: ["A) Family", "B) Cat", "C) Himself"], correct: 0 },
+            { id: 9, question: "What does 'Chore' mean?", options: ["A) Game", "B) Routine task", "C) Trip"], correct: 1 },
+            { id: 10, question: "What did he eat?", options: ["A) Eggs and toast", "B) Pizza", "C) Soup"], correct: 0 }
           ]
         };
       case "A2":
         return {
-          title: `Day ${day}: Listening to Travel Stories`,
-          audioScript: `Welcome to our travel podcast. Today we are talking about visiting London. Anna went to London last month for a five-day holiday. She visited the British Museum, took photos of Big Ben, and rode the famous red double-decker bus. Although it rained on Tuesday, she enjoyed walking around Hyde Park and drinking traditional English tea in a local café.`,
+          title: `Day ${day}: Planning a Journey Abroad`,
+          audioScript: `Welcome to our listening practice. Today, we listen to Jessica planning her international journey to Italy. She has saved money for over six months and booked a cozy hotel in Rome. She is excited to visit monuments like the Colosseum, taste authentic Italian pasta, and practice Italian phrases.`,
           vocabulary: [
-            { term: "Holiday", def: "An extended period of leisure and recreation, especially one spent away from home." },
-            { term: "Museum", def: "A building in which objects of historical, scientific, or cultural interest are stored." },
-            { term: "Traditional", def: "Existing in or as part of a tradition; long-established." }
+            { term: "Monument", def: "A notable building or structure." },
+            { term: "Authentic", def: "Genuine and original." }
           ],
           questions: [
-            { id: 1, question: "Which city is the audio about?", options: ["A) Paris", "B) London", "C) Rome"], correct: 1 },
-            { id: 2, question: "How long was Anna's holiday?", options: ["A) Three days", "B) Five days", "C) Two weeks"], correct: 1 },
-            { id: 3, question: "Which museum did she visit?", options: ["A) The British Museum", "B) The Louvre", "C) Natural History Museum"], correct: 0 },
-            { id: 4, question: "What famous landmark did she take photos of?", options: ["A) Eiffel Tower", "B) Big Ben", "C) Statue of Liberty"], correct: 1 },
-            { id: 5, question: "What type of bus did she ride?", options: ["A) Blue single-decker", "B) Red double-decker", "C) Yellow tour bus"], correct: 1 },
-            { id: 6, question: "How was the weather on Tuesday?", options: ["A) It rained", "B) It snowed", "C) It was very sunny"], correct: 0 },
-            { id: 7, question: "Which park did she walk around?", options: ["A) Central Park", "B) Hyde Park", "C) Green Park"], correct: 1 },
-            { id: 8, question: "What did she drink in a local café?", options: ["A) Coffee", "B) Traditional English tea", "C) Hot chocolate"], correct: 1 },
-            { id: 9, question: "What does 'Holiday' mean?", options: ["A) A working day", "B) A period of leisure away from home", "C) A school exam"], correct: 1 },
-            { id: 10, question: "What does 'Traditional' mean?", options: ["A) Brand new", "B) Long-established", "C) Modern"], correct: 1 }
+            { id: 1, question: "Where is Jessica traveling?", options: ["A) Spain", "B) Italy", "C) France"], correct: 1 },
+            { id: 2, question: "How long did she save money?", options: ["A) 3 months", "B) 6 months", "C) 1 year"], correct: 1 },
+            { id: 3, question: "Where is her hotel?", options: ["A) Rome", "B) Airport", "C) Village"], correct: 0 },
+            { id: 4, question: "Which monument will she visit?", options: ["A) Eiffel Tower", "B) Colosseum", "C) Big Ben"], correct: 1 },
+            { id: 5, question: "What food does she want?", options: ["A) Pasta", "B) Sushi", "C) Tacos"], correct: 0 },
+            { id: 6, question: "Why is she nervous?", options: ["A) Foreign airports", "B) Weather", "C) Passport loss"], correct: 0 },
+            { id: 7, question: "What does 'Monument' mean?", options: ["A) Mall", "B) Commemorative structure", "C) Restaurant"], correct: 1 },
+            { id: 8, question: "What does 'Authentic' mean?", options: ["A) Fake", "B) Genuine", "C) Expensive"], correct: 1 },
+            { id: 9, question: "What is enthusiasm?", options: ["A) Boredom", "B) Eager enjoyment", "C) Sadness"], correct: 1 },
+            { id: 10, question: "How is her preparation?", options: ["A) Thorough", "B) Missing", "C) Careless"], correct: 0 }
           ]
         };
       case "B1":
         return {
-          title: `Day ${day}: Listening to Workplace Discussions`,
-          audioScript: `In today's business audio guide, we discuss effective time management in modern office environments. Employees often struggle with balancing urgent tasks and long-term strategic projects. Experts recommend prioritizing daily duties using the Eisenhower matrix, minimizing digital distractions, and scheduling short breaks to maintain optimal concentration levels throughout the workday.`,
+          title: `Day ${day}: Remote Work Trends`,
+          audioScript: `Remote work has shifted how professional teams collaborate across time zones. Organizations rely on cloud software and video conferences. While offering flexibility and work-life balance, it blurs boundaries between duties and personal time. Effective communication is crucial.`,
           vocabulary: [
-            { term: "Prioritizing", def: "Treating something as more important than other things." },
-            { term: "Concentration", def: "The action or power of focusing one's attention or mental effort." },
-            { term: "Optimal", def: "Best or most favorable; optimum." }
+            { term: "Collaboration", def: "Working together." },
+            { term: "Flexibility", def: "Adapting to conditions." }
           ],
           questions: [
-            { id: 1, question: "What is the business guide focused on?", options: ["A) Financial accounting", "B) Effective time management in offices", "C) Office interior design"], correct: 1 },
-            { id: 2, question: "What do employees often struggle with?", options: ["A) Finding parking spots", "B) Balancing urgent tasks and long-term projects", "C) Operating printers"], correct: 1 },
-            { id: 3, question: "What matrix do experts recommend for prioritizing?", options: ["A) Eisenhower matrix", "B) Matrix calculation", "C) Statistical matrix"], correct: 0 },
-            { id: 4, question: "What should employees minimize?", options: ["A) Coffee intake", "B) Digital distractions", "C) Paper usage"], correct: 1 },
-            { id: 5, question: "Why should short breaks be scheduled?", options: ["A) To chat with colleagues", "B) To maintain optimal concentration levels", "C) To leave work early"], correct: 1 },
-            { id: 6, question: "What does 'Prioritizing' mean?", options: ["A) Ignoring tasks", "B) Treating something as more important", "C) Delaying work"], correct: 1 },
-            { id: 7, question: "What does 'Concentration' mean?", options: ["A) Focusing attention and mental effort", "B) Physical exercise", "C) Traveling speed"], correct: 0 },
-            { id: 8, question: "What does 'Optimal' mean?", options: ["A) Worst possible", "B) Best or most favorable", "C) Average"], correct: 1 },
-            { id: 9, question: "Where is this environment set?", options: ["A) Modern office environments", "B) Outdoor construction sites", "C) Scientific laboratories"], correct: 0 },
-            { id: 10, question: "What is the overall goal of the advice?", options: ["A) Working fewer hours with lower quality", "B) Enhancing productivity and concentration", "C) Banning all computers"], correct: 1 }
+            { id: 1, question: "What shifted collaboration?", options: ["A) Paper", "B) Remote work", "C) Relocation"], correct: 1 },
+            { id: 2, question: "What tools do organizations use?", options: ["A) Cloud software", "B) Fax", "C) Post"], correct: 0 },
+            { id: 3, question: "Major benefit?", options: ["A) Work-life balance", "B) Zero meetings", "C) Fitness"], correct: 0 },
+            { id: 4, question: "Key challenge?", options: ["A) Blurring boundaries", "B) Electricity", "C) Licenses"], correct: 0 },
+            { id: 5, question: "Crucial factor?", options: ["A) Isolation", "B) Communication and discipline", "C) 18 hours work"], correct: 1 },
+            { id: 6, question: "Collaboration means?", options: ["A) Working together", "B) Competing", "C) Alone"], correct: 0 },
+            { id: 7, question: "Flexibility means?", options: ["A) Gymnastics", "B) Adapting to conditions", "C) Rigid rules"], correct: 1 },
+            { id: 8, question: "Transparent means?", options: ["A) Hidden", "B) Clear and open", "C) Invisible"], correct: 1 },
+            { id: 9, question: "Why use messaging tools?", options: ["A) Maintain productivity", "B) Play games", "C) Waste time"], correct: 0 },
+            { id: 10, question: "Theme?", options: ["A) Workplace adaptation", "B) Factory", "C) Agriculture"], correct: 0 }
           ]
         };
       case "B2":
         return {
-          title: `Day ${day}: Audio Podcast on Cultural Adaptation`,
-          audioScript: `Moving to a foreign country involves navigating complex psychological stages of cultural adaptation. Psychologists refer to the initial phase as the honeymoon period, characterized by immense excitement and fascination. However, this is frequently followed by culture shock, where unfamiliar social norms and language barriers create frustration. Overcoming this requires patience, community engagement, and cultural curiosity.`,
+          title: `Day ${day}: Renewable Energy Transitions`,
+          audioScript: `The transition to renewable energy is an urgent socio-economic necessity. Governments invest in solar, wind, and hydroelectric power. However, intermittent supply and storage limits present hurdles. Policymakers must address workforce displacement in traditional sectors.`,
           vocabulary: [
-            { term: "Adaptation", def: "The action or process of adapting or being adapted." },
-            { term: "Fascination", def: "The state of being intensely interested or charmed." },
-            { term: "Frustration", def: "The feeling of being upset or annoyed as a result of inability to change something." }
+            { term: "Imperative", def: "Of vital importance." },
+            { term: "Intermittent", def: "Occurring at irregular intervals." }
           ],
           questions: [
-            { id: 1, question: "What does moving to a foreign country involve?", options: ["A) Immediate fluent mastery", "B) Navigating psychological stages of cultural adaptation", "C) Financial bankruptcy"], correct: 1 },
-            { id: 2, question: "What is the initial phase of adaptation called?", options: ["A) Culture shock", "B) The honeymoon period", "C) The integration stage"], correct: 1 },
-            { id: 3, question: "What characterizes the initial phase?", options: ["A) Frustration and anger", "B) Immense excitement and fascination", "C) Complete boredom"], correct: 1 },
-            { id: 4, question: "What follows the honeymoon period?", options: ["A) Instant citizenship", "B) Culture shock", "C) Permanent relocation"], correct: 1 },
-            { id: 5, question: "What causes frustration during culture shock?", options: ["A) Unfamiliar social norms and language barriers", "B) Good weather and food", "C) High salaries"], correct: 0 },
-            { id: 6, question: "What is required to overcome culture shock?", options: ["A) Isolation and complaining", "B) Patience, community engagement, and curiosity", "C) Avoiding local people"], correct: 1 },
-            { id: 7, question: "What does 'Adaptation' mean?", options: ["A) The process of adjusting to new conditions", "B) Staying exactly the same", "C) Rejecting new cultures"], correct: 0 },
-            { id: 8, question: "What does 'Fascination' mean?", options: ["A) Intense interest or charm", "B) Fear of heights", "C) Total indifference"], correct: 0 },
-            { id: 9, question: "What does 'Frustration' mean?", options: ["A) Joy and happiness", "B) Annoyance due to inability to change or achieve something", "C) Complete relaxation"], correct: 1 },
-            { id: 10, question: "What is the core takeaway of the audio segment?", options: ["A) Moving abroad is easy", "B) Cultural adaptation has psychological phases that can be overcome", "C) People should never travel"], correct: 1 }
+            { id: 1, question: "Transition shifted into?", options: ["A) Minor debate", "B) Socio-economic necessity", "C) Trend"], correct: 1 },
+            { id: 2, question: "Corporations investing in?", options: ["A) Coal", "B) Solar, wind, hydroelectric", "C) Engines"], correct: 1 },
+            { id: 3, question: "Logistical obstacle?", options: ["A) Intermittent supply & storage limits", "B) No sunlight", "C) Opposition"], correct: 0 },
+            { id: 4, question: "Workforce issue?", options: ["A) Tech shortages", "B) Displacement in fossil fuel sectors", "C) Salaries"], correct: 1 },
+            { id: 5, question: "Improving viability?", options: ["A) Photovoltaic & batteries", "B) Steam engines", "C) Printing press"], correct: 0 },
+            { id: 6, question: "Imperative means?", options: ["A) Unimportant", "B) Crucial", "C) Illegal"], correct: 1 },
+            { id: 7, question: "Intermittent means?", options: ["A) Constant", "B) Irregular intervals", "C) Broken"], correct: 1 },
+            { id: 8, question: "Multifaceted means?", options: ["A) Simple", "B) Complex", "C) Cheap"], correct: 1 },
+            { id: 9, question: "Ecological success determined by?", options: ["A) Grassroots awareness & reforms", "B) Deregulation", "C) Halting science"], correct: 0 },
+            { id: 10, question: "Primary message?", options: ["A) Vital, complex, advancing", "B) Fossil fuels sustainable", "C) No impact"], correct: 0 }
           ]
         };
       case "C1":
         return {
-          title: `Day ${day}: Advanced Lecture on Macroeconomic Trends`,
-          audioScript: `In today's economic seminar, we analyze the intricate correlation between fiscal policy adjustments and inflationary pressures. Central banks worldwide utilize interest rate mechanisms to modulate aggregate demand and stabilize currency valuations. However, unanticipated geopolitical disruptions can severely distort supply chains, rendering traditional predictive models temporarily ineffective.`,
+          title: `Day ${day}: Cognitive Biases & Market Behavior`,
+          audioScript: `Behavioral economics examines how cognitive biases distort rational decisions. Heuristic shortcuts like confirmation bias and loss aversion skew risk assessment. Market exuberance inflates asset values. Recognizing these blind spots is critical.`,
           vocabulary: [
-            { term: "Correlation", def: "A mutual relationship or connection between two or more things." },
-            { term: "Modulate", def: "Exert a modifying or controlling influence on something." },
-            { term: "Disruption", def: "Disturbance or problems which interrupt an event, activity, or process." }
+            { term: "Heuristic", def: "Mental shortcuts for problem-solving." },
+            { term: "Corroborate", def: "Confirm findings." }
           ],
           questions: [
-            { id: 1, question: "What do central banks utilize interest rates for?", options: ["A) To fund private vacations", "B) To modulate aggregate demand and stabilize currency", "C) To print physical paper money faster"], correct: 1 },
-            { id: 2, question: "What is analyzed in the economic seminar?", options: ["A) Fiscal policy and inflationary pressures correlation", "B) Agricultural crop rotation", "C) Ancient monetary systems"], correct: 0 },
-            { id: 3, question: "What can severely distort supply chains?", options: ["A) Unanticipated geopolitical disruptions", "B) Standard weather forecasts", "C) Stable international relations"], correct: 0 },
-            { id: 4, question: "What happens to traditional predictive models during disruptions?", options: ["A) They become more accurate", "B) They are rendered temporarily ineffective", "C) They are permanently banned"], correct: 1 },
-            { id: 5, question: "What does 'Correlation' mean?", options: ["A) Mutual relationship between things", "B) Complete independence", "C) Financial loss"], correct: 0 },
-            { id: 6, question: "What does 'Modulate' mean?", options: ["A) To destroy completely", "B) To exert a controlling influence", "C) To ignore completely"], correct: 1 },
-            { id: 7, question: "What does 'Disruption' refer to?", options: ["A) Smooth operation", "B) Disturbance interrupting a process", "C) Perfect financial balance"], correct: 1 },
-            { id: 8, question: "Who utilizes interest rate mechanisms?", options: ["A) Central banks worldwide", "B) Local supermarkets", "C) University students"], correct: 0 },
-            { id: 9, question: "What is the primary topic of the lecture?", options: ["A) Macroeconomic monetary policy and inflation", "B) Personal budgeting", "C) Real estate sales"], correct: 0 },
-            { id: 10, question: "Why are predictive models sometimes ineffective?", options: ["A) Because economic variables are static", "B) Due to unexpected geopolitical shocks", "C) Because computers are too fast"], correct: 1 }
+            { id: 1, question: "Classic economics assumption challenged?", options: ["A) Humans are rational maximizers", "B) Prices fall", "C) No inflation"], correct: 0 },
+            { id: 2, question: "Heuristics distort?", options: ["A) Networks", "B) Rational decisions & risk assessment", "C) Grammar"], correct: 1 },
+            { id: 3, question: "Confirmation bias effect?", options: ["A) Neutrality", "B) Favoring pre-existing beliefs", "C) Memory loss"], correct: 1 },
+            { id: 4, question: "Herd mentality leads to?", options: ["A) Financial volatility & inflated values", "B) Stability", "C) Stagnation"], correct: 0 },
+            { id: 5, question: "Recognizing blind spots helps?", options: ["A) Risk mitigation & safeguards", "B) Confusion", "C) Eliminating banks"], correct: 0 },
+            { id: 6, question: "Heuristic refers to?", options: ["A) Mental shortcuts", "B) Equations", "C) Damage"], correct: 0 },
+            { id: 7, question: "Corroborate means?", options: ["A) Contradict", "B) Confirm", "C) Hide"], correct: 1 },
+            { id: 8, question: "Exuberance means?", options: ["A) Panic", "B) Over-optimism", "C) Compliance"], correct: 1 },
+            { id: 9, question: "Loss aversion causes?", options: ["A) Avoiding losses over gains", "B) Risk", "C) Joy"], correct: 0 },
+            { id: 10, question: "Conclusion?", options: ["A) Biases influence economics", "B) Humans are logical", "C) Irrelevant"], correct: 0 }
           ]
         };
-      case "C2":
-      default:
+      case "SAT":
         return {
-          title: `Day ${day}: Philosophical Discourse on Phenomenological Reduction`,
-          audioScript: `In this advanced philosophical lecture, we investigate Husserlian phenomenological reduction, bracketing pre-conceived empirical assumptions to examine pure consciousness. By neutralizing ontological commitments regarding the external world, phenomenologists aim to uncover the invariant structures of subjective experience. This rigorous introspection transcends ordinary epistemological inquiry, establishing an unshakeable foundation for phenomenological philosophy.`,
+          title: `Day ${day}: Elite SAT Listening & Rhetorical Analysis Panel`,
+          audioScript: `SAT Listening Simulation: Academic lecture discussing algorithmic profiling in justice and cognitive biases. Researchers emphasize auditing protocols, data transparency, and human-in-the-loop oversight to counter historical training dataset anomalies and ensure absolute structural equity.`,
           vocabulary: [
-            { term: "Phenomenological", def: "Relating to the study of structures of consciousness and subjective experience." },
-            { term: "Bracketing", def: "Suspending judgment regarding the reality of the external world." },
-            { term: "Introspection", def: "The examination or observation of one's own mental and emotional processes." }
+            { term: "Profiling", def: "Behavioral pattern analysis." },
+            { term: "Contend", def: "To assert in argument." }
           ],
           questions: [
-            { id: 1, question: "What is investigated in the lecture?", options: ["A) Husserlian phenomenological reduction", "B) Modern quantum physics", "C) Medieval history"], correct: 0 },
-            { id: 2, question: "What does bracketing involve in phenomenology?", options: ["A) Suspending judgment regarding external reality", "B) Writing books inside brackets", "C) Mathematical calculations"], correct: 0 },
-            { id: 3, question: "What is the ultimate aim of bracketing assumptions?", options: ["A) To uncover invariant structures of subjective consciousness", "B) To prove the external world does not exist", "C) To increase economic output"], correct: 0 },
-            { id: 4, question: "What does phenomenological inquiry transcend?", options: ["A) Ordinary epistemological inquiry", "B) Basic arithmetic", "C) Physical laws of motion"], correct: 0 },
-            { id: 5, question: "What is 'Introspection'?", options: ["A) Observation of one's own mental processes", "B) Telescopic observation of stars", "C) Social group interaction"], correct: 0 },
-            { id: 6, question: "What does 'Phenomenological' relate to?", options: ["A) Structures of consciousness and subjective experience", "B) Chemical reactions", "C) Weather forecasting"], correct: 0 },
-            { id: 7, question: "What does 'Bracketing' mean in this context?", options: ["A) Suspending preconceptions", "B) Creating physical fences", "C) Grouping data points"], correct: 0 },
-            { id: 8, question: "What kind of foundation does this establish?", options: ["A) An unshakeable foundation for phenomenological philosophy", "B) A temporary commercial hypothesis", "C) A flawed theoretical structure"], correct: 0 },
-            { id: 9, question: "Whose reduction method is discussed?", options: ["A) Husserl's", "B) Plato's", "C) Descartes'"], correct: 0 },
-            { id: 10, question: "What is the core focus of the audio session?", options: ["A) Pure consciousness and phenomenological epoche", "B) Everyday conversation skills", "C) Financial market trends"], correct: 0 }
+            { id: 1, question: "Focus of lecture?", options: ["A) Hardware costs", "B) Algorithmic profiling ethics", "C) Court history"], correct: 1 },
+            { id: 2, question: "Proponents claim machine learning minimizes?", options: ["A) Human prejudice", "B) Speed", "C) Taxes"], correct: 0 },
+            { id: 3, question: "Main criticism?", options: ["A) Speed", "B) Biased datasets", "C) Power"], correct: 1 },
+            { id: 4, question: "Human judges exhibit?", options: ["A) Precision", "B) Fatigue and bias", "C) Immunity"], correct: 1 },
+            { id: 5, question: "Advocated solution?", options: ["A) Automation", "B) Auditing, transparency, oversight", "C) Banning"], correct: 1 },
+            { id: 6, question: "Contend means?", options: ["A) Agree", "B) Assert position", "C) Surrender"], correct: 1 },
+            { id: 7, question: "Auditing involves?", options: ["A) Inspection and evaluation", "B) Bankruptcy", "C) Review"], correct: 0 },
+            { id: 8, question: "Lecture structure?", options: ["A) Refutes", "B) Examines multiple viewpoints and solutions", "C) Unrelated"], correct: 1 },
+            { id: 9, question: "Neutrality illusion?", options: ["A) Discrimination persists unseen", "B) Living computers", "C) Speed"], correct: 0 },
+            { id: 10, question: "Core objective?", options: ["A) Analytical synthesis", "B) Fiction", "C) Memorization"], correct: 0 }
+          ]
+        };
+      case "IELTS":
+      default:
+        return {
+          title: `Day ${day}: Elite IELTS Academic Listening: Megacity Infrastructures`,
+          audioScript: `IELTS Academic Listening: Lecture on urban megacity expansion. Rural migration strains municipal services, housing, and air quality. Experts advocate smart-city technologies, efficient public transit, and green architecture to mitigate ecological degradation.`,
+          vocabulary: [
+            { term: "Agglomeration", def: "Mass collection." },
+            { term: "Municipal", def: "City governing." }
+          ],
+          questions: [
+            { id: 1, question: "Megacity definition?", options: ["A) Over 10 million residents", "B) No cars", "C) Glass"], correct: 0 },
+            { id: 2, question: "Migration driver?", options: ["A) Farming", "B) Jobs, education, healthcare", "C) Force"], correct: 1 },
+            { id: 3, question: "Municipal strain?", options: ["A) Housing and traffic congestion", "B) Electricity", "C) Space"], correct: 0 },
+            { id: 4, question: "Solutions emphasized?", options: ["A) Smart-city tech, transit, green architecture", "B) Demolition", "C) Stopping migration"], correct: 0 },
+            { id: 5, question: "Failure risk?", options: ["A) Uninhabitable urban sprawls", "B) Farmland", "C) Sinking"], correct: 0 },
+            { id: 6, question: "Agglomeration means?", options: ["A) Wasteland", "B) Mass collection coming together", "C) Isolated"], correct: 1 },
+            { id: 7, question: "Precipitate means?", options: ["A) Cause suddenly", "B) Delay", "C) Calculate"], correct: 0 },
+            { id: 8, question: "Municipal relates to?", options: ["A) Military", "B) City or town governing bodies", "C) Trade"], correct: 1 },
+            { id: 9, question: "Air quality consequence?", options: ["A) Degraded and polluted", "B) Pristine", "C) Unaffected"], correct: 0 },
+            { id: 10, question: "Primary purpose?", options: ["A) Academic comprehension of phenomena", "B) Entertainment", "C) Alphabet"], correct: 0 }
           ]
         };
     }
@@ -206,15 +246,9 @@ export default function ListeningLevelPage({ params }: { params: Promise<{ level
 
   const handleSubmitTest = () => {
     let correctCount = 0;
-    currentData.questions.forEach((q) => {
-      if (selectedAnswers[q.id] === q.correct) {
-        correctCount++;
-      }
-    });
-
+    currentData.questions.forEach((q) => { if (selectedAnswers[q.id] === q.correct) correctCount++; });
     setScore(correctCount);
     setIsSubmitted(true);
-
     if (correctCount >= 7 && !completedDays.includes(activeDay)) {
       const updated = [...completedDays, activeDay];
       setCompletedDays(updated);
@@ -222,15 +256,10 @@ export default function ListeningLevelPage({ params }: { params: Promise<{ level
     }
   };
 
-  const handleRetry = () => {
-    setIsSubmitted(false);
-    setSelectedAnswers({});
-  };
-
+  const handleRetry = () => { setIsSubmitted(false); setSelectedAnswers({}); };
   const handleNextDay = () => {
-    setIsSubmitted(false);
-    setSelectedAnswers({});
-    setActiveDay(activeDay + 1);
+    setIsSubmitted(false); setSelectedAnswers({}); setActiveDay(activeDay + 1);
+    setCurrentTime(0); if ('speechSynthesis' in window) window.speechSynthesis.cancel(); setIsPlaying(false);
   };
 
   return (
@@ -239,7 +268,7 @@ export default function ListeningLevelPage({ params }: { params: Promise<{ level
         <div className="flex justify-between items-center bg-slate-900 p-6 rounded-3xl border border-white/10 shadow-xl">
           <Link href="/" className="text-blue-400 font-bold hover:underline text-sm">← Main Menu</Link>
           <h1 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">
-            {level} Level • Listening Module
+            {isSpecialExam ? `${level} Elite Listening Panel` : `${level} Level • Long Listening Module`}
           </h1>
         </div>
 
@@ -250,12 +279,9 @@ export default function ListeningLevelPage({ params }: { params: Promise<{ level
               completedDays={completedDays} 
               activeDay={activeDay} 
               onSelectDay={(day: number) => {
-                setActiveDay(day);
-                setIsSubmitted(false);
-                setSelectedAnswers({});
+                setActiveDay(day); setIsSubmitted(false); setSelectedAnswers({});
                 if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-                setIsPlaying(false);
-                setShowTranscript(false);
+                setIsPlaying(false); setShowTranscript(false); setCurrentTime(0);
               }} 
             />
           </div>
@@ -269,31 +295,39 @@ export default function ListeningLevelPage({ params }: { params: Promise<{ level
                 </span>
               </div>
               
-              <div className="bg-slate-950 p-6 rounded-2xl border border-white/10 space-y-4">
+              <div className="bg-slate-950 p-6 rounded-2xl border border-white/10 space-y-4 shadow-inner">
                 <div className="flex items-center space-x-4">
                   <button 
                     onClick={() => handlePlayAudio(currentData.audioScript)}
-                    className="w-14 h-14 rounded-full bg-purple-600 hover:bg-purple-500 flex items-center justify-center font-bold text-xl shadow-lg transition transform hover:scale-105 cursor-pointer"
+                    className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 flex items-center justify-center font-bold text-xl shadow-lg transition transform hover:scale-105 cursor-pointer flex-shrink-0"
                   >
-                    {isPlaying ? "⏹" : "▶"}
+                    {isPlaying ? "⏸" : "▶"}
                   </button>
-                  <div>
-                    <h4 className="text-sm font-bold text-white">
-                      {isPlaying ? "Playing Audio Track..." : "Click to Play Audio"}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-bold text-white truncate">
+                      {isPlaying ? "Playing Audio Session..." : "Click Play to Start Audio"}
                     </h4>
-                    <p className="text-xs text-gray-400">Native speaker audio simulation ({level} Standard)</p>
+                    <p className="text-xs text-gray-400">Native Advanced Simulation ({level})</p>
+                  </div>
+                  <div className="text-xs font-mono font-bold text-purple-300 bg-purple-950/50 px-3 py-1.5 rounded-xl border border-purple-500/30">
+                    {formatTime(currentTime)} / {formatTime(duration)}
                   </div>
                 </div>
 
-                <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                  <div className={`bg-gradient-to-r from-purple-500 to-pink-500 h-full transition-all duration-500 ${isPlaying ? "w-full animate-pulse" : "w-1/4"}`}></div>
+                <div className="space-y-1">
+                  <input
+                    type="range" min={0} max={duration} value={currentTime} onChange={handleSeek}
+                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-pink-500"
+                  />
+                  <div className="flex justify-between text-[10px] text-gray-500 font-mono">
+                    <span>00:00</span><span>{formatTime(duration)}</span>
+                  </div>
                 </div>
 
-                {/* Transcript Aç / Bağla düyməsi */}
                 <div className="pt-2">
                   <button
                     onClick={() => setShowTranscript(!showTranscript)}
-                    className="px-4 py-2 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/30 text-xs font-bold hover:bg-purple-500/20 transition"
+                    className="px-4 py-2 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/30 text-xs font-bold hover:bg-purple-500/20 transition cursor-pointer"
                   >
                     {showTranscript ? "▼ Hide Transcript" : "▶ Show Transcript"}
                   </button>
@@ -321,28 +355,23 @@ export default function ListeningLevelPage({ params }: { params: Promise<{ level
 
             <div className="p-8 bg-slate-900 rounded-3xl border border-white/10 space-y-8 shadow-2xl">
               <div className="border-b border-white/10 pb-4">
-                <h3 className="text-xl font-bold">Listening Comprehension Test</h3>
-                <p className="text-xs text-gray-400 mt-1">You need at least 7 correct answers to unlock the next day. (Click selected option again to deselect).</p>
+                <h3 className="text-xl font-bold">Comprehension Test</h3>
+                <p className="text-xs text-gray-400 mt-1">Score at least 7 correct answers to unlock next day.</p>
               </div>
 
               <div className="space-y-6">
                 {currentData.questions.map((q, qIndex) => (
                   <div key={q.id} className="p-5 bg-slate-950/60 rounded-2xl border border-white/5 space-y-3">
-                    <p className="text-sm font-bold text-gray-200">
-                      {qIndex + 1}. {q.question}
-                    </p>
+                    <p className="text-sm font-bold text-gray-250">{qIndex + 1}. {q.question}</p>
                     <div className="grid grid-cols-1 gap-2">
                       {q.options.map((opt, optIndex) => {
                         const isSelected = selectedAnswers[q.id] === optIndex;
                         return (
                           <button
-                            key={optIndex}
-                            disabled={isSubmitted}
+                            key={optIndex} disabled={isSubmitted}
                             onClick={() => handleOptionSelect(q.id, optIndex)}
-                            className={`p-3 rounded-xl text-xs font-bold text-left transition border ${
-                              isSelected
-                                ? "bg-purple-600 border-purple-400 text-white shadow-md"
-                                : "bg-white/5 border-white/10 text-gray-300 hover:border-purple-500/50"
+                            className={`p-3 rounded-xl text-xs font-bold text-left transition border cursor-pointer ${
+                              isSelected ? "bg-purple-600 border-purple-400 text-white shadow-md" : "bg-white/5 border-white/10 text-gray-300 hover:border-purple-500/50"
                             }`}
                           >
                             {opt}
@@ -355,36 +384,19 @@ export default function ListeningLevelPage({ params }: { params: Promise<{ level
               </div>
 
               {!isSubmitted ? (
-                <button
-                  onClick={handleSubmitTest}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-black text-sm hover:opacity-90 transition shadow-xl"
-                >
+                <button onClick={handleSubmitTest} className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-black text-sm hover:opacity-90 transition shadow-xl cursor-pointer">
                   Submit Listening Answers
                 </button>
               ) : (
                 <div className="p-6 bg-slate-950 rounded-2xl border border-white/10 text-center space-y-4">
-                  <p className="text-lg font-bold">
-                    Your Score: <span className={score >= 7 ? "text-green-400" : "text-yellow-400"}>{score} / 10</span>
-                  </p>
+                  <p className="text-lg font-bold">Your Score: <span className={score >= 7 ? "text-green-400" : "text-yellow-400"}>{score} / 10</span></p>
                   <p className="text-xs text-gray-400">
-                    {score >= 7 
-                      ? "🎉 Congratulations! You successfully passed this listening day." 
-                      : "⚠️ You scored less than 7. You can retry the test to improve your score!"}
+                    {score >= 7 ? "🎉 Congratulations! Passed successfully." : "⚠️ Score below 7. Retry to improve!"}
                   </p>
                   <div className="flex justify-center gap-4 pt-2">
-                    <button
-                      onClick={handleRetry}
-                      className="px-6 py-3 rounded-xl bg-slate-800 text-white font-bold text-xs hover:bg-slate-700 transition shadow-lg border border-white/10"
-                    >
-                      🔄 Retry Test
-                    </button>
+                    <button onClick={handleRetry} className="px-6 py-3 rounded-xl bg-slate-800 text-white font-bold text-xs hover:bg-slate-700 transition border border-white/10 cursor-pointer">🔄 Retry Test</button>
                     {score >= 7 && activeDay < 60 && (
-                      <button
-                        onClick={handleNextDay}
-                        className="px-6 py-3 rounded-xl bg-green-600 text-white font-bold text-xs hover:bg-green-500 transition shadow-lg"
-                      >
-                        Next Listening Day (Day {activeDay + 1}) →
-                      </button>
+                      <button onClick={handleNextDay} className="px-6 py-3 rounded-xl bg-green-600 text-white font-bold text-xs hover:bg-green-500 transition cursor-pointer">Next Day →</button>
                     )}
                   </div>
                 </div>

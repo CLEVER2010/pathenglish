@@ -5,11 +5,12 @@ import ProgressCalendar from "../../components/ProgressCalendar";
 
 export default function ReadingLevelPage({ params }: { params: Promise<{ level: string }> }) {
   const resolvedParams = use(params);
-  const level = resolvedParams.level.toUpperCase();
+  const rawLevel = resolvedParams.level.toUpperCase();
+  const isSpecialExam = rawLevel === "SAT" || rawLevel === "IELTS";
+  const level = isSpecialExam ? rawLevel : rawLevel;
   
   const [activeDay, setActiveDay] = useState<number>(1);
   const [completedDays, setCompletedDays] = useState<number[]>([]);
-  
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
@@ -17,15 +18,10 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
   useEffect(() => {
     const saved = localStorage.getItem(`reading_${level}_progress`);
     if (saved) {
-      try {
-        setCompletedDays(JSON.parse(saved));
-      } catch (e) {
-        console.error(e);
-      }
+      try { setCompletedDays(JSON.parse(saved)); } catch (e) { console.error(e); }
     }
   }, [level]);
 
-  // Hər səviyyəyə (A1-C2) və günə uyğun xüsusi, fərqli mətnlər
   const getDayContent = (lvl: string, day: number) => {
     switch (lvl) {
       case "A1":
@@ -96,69 +92,91 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
         };
       case "B2":
         return {
-          title: `Day ${day}: Environmental Sustainability and Renewable Energy Transitions`,
-          text: `The global transition from fossil fuels to renewable energy sources has emerged as one of the most critical socio-economic imperatives of our time. As industrial carbon emissions continue to exacerbate climate change, governments and corporations are heavily investing in solar, wind, and hydroelectric power infrastructures. Nevertheless, moving away from conventional energy grids presents complex engineering and financial challenges. Energy storage limitations, grid modernization requirements, and high initial capital investments often slow down the implementation process. Despite these obstacles, technological advancements in battery efficiency and photovoltaic cells are steadily improving economic viability. Furthermore, public awareness campaigns encourage citizens to adopt sustainable habits, demonstrating that collective grassroots efforts combined with institutional policy changes can yield substantial long-term ecological benefits.`,
+          title: `Day ${day}: Environmental Sustainability and Renewable Transitions`,
+          text: `The global imperative to transition from fossil-fuel-dependent economies to renewable energy infrastructures has emerged as one of the defining socio-economic challenges of the twenty-first century. As industrial carbon emissions persistently exacerbate global climate anomalies, international governing bodies, corporate entities, and scientific consortia are heavily investing in solar photovoltaic arrays, offshore wind farms, and advanced hydroelectric grids. Nevertheless, migrating away from conventional centralized energy distribution introduces a myriad of intricate engineering and financial hurdles. Intermittent power generation, massive energy storage capacity constraints, and staggering initial capital expenditures frequently impede the velocity of widespread implementation. Furthermore, policymakers face the delicate task of managing labor market dislocations within traditional fossil fuel sectors, ensuring an equitable socio-economic transition for vulnerable regional communities.`,
           vocabulary: [
-            { term: "Imperative", def: "Of vital importance; crucial." },
-            { term: "Exacerabate", def: "Make a problem or bad situation worse." },
-            { term: "Viability", def: "The ability to work successfully or survive sustainably." }
+            { term: "Consortium", def: "An association pooling resources." },
+            { term: "Dislocation", def: "Disturbance from a proper or usual place or state." },
+            { term: "Synergistic", def: "Working together cooperatively." }
           ],
           questions: [
-            { id: 1, question: "What has emerged as a critical global socio-economic imperative?", options: ["A) Space colonization", "B) Transitioning from fossil fuels to renewables", "C) Expanding traditional oil pipelines"], correct: 1 },
-            { id: 2, question: "What do industrial carbon emissions contribute to?", options: ["A) Economic stability", "B) Exacerbating climate change", "C) Improving agricultural yields"], correct: 1 },
-            { id: 3, question: "Why is moving away from conventional energy grids difficult?", options: ["A) Due to engineering, storage, and financial challenges", "B) Because renewable energy does not exist", "C) Because public demand is zero"], correct: 0 },
-            { id: 4, question: "What technological advancements are improving economic viability?", options: ["A) Paper manufacturing and printing", "B) Battery efficiency and photovoltaic cells", "C) Mechanical clockwork mechanisms"], correct: 1 },
-            { id: 5, question: "What role do public awareness campaigns play?", options: ["A) They encourage citizens to adopt sustainable habits", "B) They promote higher fossil fuel consumption", "C) They discourage scientific research"], correct: 0 },
-            { id: 6, question: "What does combination of grassroots efforts and policy changes yield?", options: ["A) Short-term financial loss", "B) Substantial long-term ecological benefits", "C) Increased carbon emissions"], correct: 1 },
-            { id: 7, question: "What does 'Imperative' mean?", options: ["A) Unimportant or trivial", "B) Of vital importance; crucial", "C) Temporary and optional"], correct: 1 },
-            { id: 8, question: "What does 'Viability' refer to in this context?", options: ["A) The ability to work successfully and sustainably", "B) The physical weight of solar panels", "C) The speed of wind turbines"], correct: 0 },
-            { id: 9, question: "What hinders the rapid implementation of renewable systems?", options: ["A) High initial capital investments and storage limits", "B) Excessively sunny weather", "C) Lack of interest from engineers"], correct: 0 },
-            { id: 10, question: "What is the primary message of the text?", options: ["A) Renewable transition is challenging yet vital and progressing", "B) Fossil fuels are the only viable future", "C) Environmental policies are completely useless"], correct: 0 }
+            { id: 1, question: "What has the transition to renewable energy emerged as?", options: ["A) A minor local policy adjustment", "B) A defining socio-economic challenge of the 21st century", "C) A temporary corporate marketing strategy"], correct: 1 },
+            { id: 2, question: "What are scientific consortia and governments investing in?", options: ["A) Coal extraction machinery", "B) Solar arrays, offshore wind farms, and hydroelectric grids", "C) Internal combustion engine development"], correct: 1 },
+            { id: 3, question: "What specific hurdles impede rapid implementation?", options: ["A) Intermittent power, storage constraints, and high capital expenditures", "B) Total lack of sunlight across the planet", "C) Complete absence of engineering expertise"], correct: 0 },
+            { id: 4, question: "What labor market issue must policymakers manage?", options: ["A) Massive job shortages in software tech", "B) Labor market dislocations within traditional fossil fuel sectors", "C) Excessive wages for renewable engineers"], correct: 1 },
+            { id: 5, question: "What scientific fields are elevating commercial viability?", options: ["A) Battery chemistry, smart-grid automation, and material science", "B) Mechanical clockwork engineering", "C) Traditional paper manufacturing"], correct: 0 },
+            { id: 6, question: "What does 'Consortium' mean?", options: ["A) An isolated enterprise", "B) An association of companies pooling resources", "C) A government tax agency"], correct: 1 },
+            { id: 7, question: "What does 'Dislocation' refer to?", options: ["A) Geographical relocation", "B) Economic disturbance and job displacement", "C) Bone fractures"], correct: 1 },
+            { id: 8, question: "What does 'Synergistic' signify?", options: ["A) Working together for an enhanced effect", "B) Competing aggressively", "C) Working in isolation"], correct: 0 },
+            { id: 9, question: "What factors will dictate ecological success?", options: ["A) Grassroots advocacy combined with institutional reforms", "B) Total deregulation", "C) Halting research"], correct: 0 },
+            { id: 10, question: "What is the tone of this passage?", options: ["A) Analytical and progressive", "B) Dismissive", "C) Promotional"], correct: 0 }
           ]
         };
       case "C1":
         return {
-          title: `Day ${day}: Cognitive Biases in Decision-Making and Economic Behavior`,
-          text: `Behavioral economics and cognitive psychology have profoundly reshaped our understanding of human rationality, challenging the classical economic assumption that individuals always act as perfectly rational maximizers. Research pioneered by notable cognitive scientists reveals that human decision-making is systematically influenced by heuristic mental shortcuts and cognitive biases. Confirmation bias, anchoring effects, and loss aversion frequently skew objective risk assessment in financial markets, corporate boardrooms, and everyday choices. For instance, confirmation bias leads individuals to selectively process information that aligns with pre-existing beliefs while discounting contradictory evidence. Recognizing these mental blind spots is essential not only for improving individual judgment but also for designing robust institutional safeguards that mitigate systemic economic volatility and irrational market exuberance.`,
+          title: `Day ${day}: Advanced Discourse on Behavioral Economics and Cognitive Biases`,
+          text: `Behavioral economics has fundamentally revolutionized our comprehension of human rationality, systematically challenging the classical economic axiom that individuals invariably operate as utility-maximizing, perfectly rational agents. Pioneering scholarship in cognitive psychology demonstrates that decision-making architectures are heavily mediated by heuristic mental shortcuts and implicit cognitive biases. Confirmation bias, anchoring heuristics, and asymmetric loss aversion chronically skew objective risk appraisal across financial markets, corporate governance boards, and daily consumer behavior. Recognizing these psychological blind spots is paramount not only for refining individual analytical judgment but also for engineering robust institutional safeguards that mitigate systemic macroeconomic volatility.`,
           vocabulary: [
-            { term: "Heuristic", def: "Enabling a person to discover or learn something for themselves (mental shortcut)." },
-            { term: "Aversion", def: "A strong dislike or opposing inclination (e.g., loss aversion)." },
-            { term: "Exuberance", def: "The quality of being full of energy, excitement, or over-optimism." }
+            { term: "Axiom", def: "A self-evident proposition." },
+            { term: "Appraisal", def: "An act of evaluating something." },
+            { term: "Contagion", def: "The spreading of a mood or idea." }
           ],
           questions: [
-            { id: 1, question: "What classical economic assumption has behavioral research challenged?", options: ["A) That humans are always perfectly rational maximizers", "B) That markets never fluctuate in value", "C) That money is the only motivator"], correct: 0 },
-            { id: 2, question: "What systematically influences human decision-making according to scientists?", options: ["A) Random coin tosses", "B) Heuristic mental shortcuts and cognitive biases", "C) Strict mathematical algorithms only"], correct: 1 },
-            { id: 3, question: "How does confirmation bias affect information processing?", options: ["A) It makes people process all data equally", "B) It leads individuals to favor data matching pre-existing beliefs", "C) It completely eliminates memory retention"], correct: 1 },
-            { id: 4, question: "Where do anchoring effects and loss aversion skew objective risk assessment?", options: ["A) Only in laboratory card games", "B) In financial markets, boardrooms, and everyday choices", "C) Exclusively in ancient history"], correct: 1 },
-            { id: 5, question: "Why is recognizing cognitive blind spots important?", options: ["A) To improve judgment and design institutional safeguards", "B) To increase market exuberance", "C) To eliminate all economic activity"], correct: 0 },
-            { id: 6, question: "What does loss aversion describe?", options: ["A) The preference of avoiding losses over acquiring equivalent gains", "B) The tendency to lose money on purpose", "C) Joy experienced during economic crashes"], correct: 0 },
-            { id: 7, question: "What does 'Heuristic' mean in cognitive psychology?", options: ["A) A complex mathematical formula", "B) A practical mental shortcut for problem-solving", "C) A permanent brain injury"], correct: 1 },
-            { id: 8, question: "What is 'Exuberance' associated with in market contexts?", options: ["A) Extreme pessimism and panic", "B) Over-optimism and inflated asset values", "C) Absolute regulatory silence"], correct: 1 },
-            { id: 9, question: "What do institutional safeguards aim to mitigate?", options: ["A) Systemic economic volatility and irrationality", "B) Scientific research funding", "C) Technological innovation"], correct: 0 },
-            { id: 10, question: "What is the core conclusion of the passage?", options: ["A) Human rationality is flawless", "B) Biases skew decisions, making awareness and safeguards essential", "C) Economics has no relation to psychology"], correct: 1 }
+            { id: 1, question: "What classical economic axiom has behavioral economics challenged?", options: ["A) That humans always act as perfectly rational maximizers", "B) That prices never fluctuate", "C) That money is everything"], correct: 0 },
+            { id: 2, question: "What mediates human decision-making structures?", options: ["A) Pure algorithms", "B) Heuristic mental shortcuts and cognitive biases", "C) Random impulses"], correct: 1 },
+            { id: 3, question: "How does confirmation bias affect data processing?", options: ["A) Total neutrality", "B) Favoring evidence corroborating pre-existing hypotheses", "C) Erasing memory"], correct: 1 },
+            { id: 4, question: "What can market exuberance cause?", options: ["A) Inflation of asset bubbles beyond intrinsic values", "B) Market stability", "C) Economic stagnation"], correct: 0 },
+            { id: 5, question: "Why is identifying cognitive blind spots critical?", options: ["A) For refining judgment and institutional safeguards", "B) To maximize confusion", "C) To eliminate banks"], correct: 0 },
+            { id: 6, question: "What does 'Axiom' mean?", options: ["A) Proven false", "B) A self-evident foundational proposition", "C) A hypothesis"], correct: 1 },
+            { id: 7, question: "What does 'Appraisal' mean?", options: ["A) Evaluation or assessment", "B) Avoidance", "C) Loss"], correct: 0 },
+            { id: 8, question: "What does 'Contagion' signify?", options: ["A) Spreading of ideas across participants", "B) Virus outbreaks", "C) Supervision"], correct: 0 },
+            { id: 9, question: "What does loss aversion involve?", options: ["A) Preferring to avoid losses over equivalent gains", "B) Seeking risk", "C) Indifference"], correct: 0 },
+            { id: 10, question: "What is the principal conclusion?", options: ["A) Psychological biases distort economic decisions, making awareness vital", "B) Humans are logical calculators", "C) No connection"], correct: 0 }
           ]
         };
-      case "C2":
-      default:
+      case "SAT":
         return {
-          title: `Day ${day}: Epistemological Frameworks in Post-Modern Philosophical Discourse`,
-          text: `Contemporary epistemology is characterized by an intricate deconstruction of foundationalist paradigms, ushering in an era of pluralistic justification models and radical contextualism. Philosophers scrutinize the demarcation criteria between empirical validation and socially constructed reality, questioning the ontological status of objective truth in hyper-mediated environments. As hermeneutic circles intersect with analytical philosophy, the traditional tripartite definition of knowledge—justified true belief—faces rigorous scrutiny from Gettier-type counterexamples and pragmatic skepticism. Navigating these labyrinthine intellectual terrains demands an uncompromising commitment to rigorous dialectical analysis, transcending dogmatic assertions to embrace a nuanced, self-correcting appreciation of human intellect and its inherent interpretive limitations.`,
+          title: `Day ${day}: Elite SAT Evidence-Based Reading & Rhetorical Analysis Panel`,
+          text: `SAT Elite Module: Passage 1 examines the implementation of automated algorithmic decision-making in legal systems. Proponents argue it reduces human prejudice, while critics warn of historical biases embedded in training datasets. Passage 2 suggests that human judges also suffer from cognitive fatigue and emotional inconsistencies. The optimal path forward involves strict regulatory auditing, structural transparency, and mandatory human-in-the-loop oversight to ensure true equity in modern judicial administration.`,
           vocabulary: [
-            { term: "Epistemology", def: "The philosophical study of the nature, origin, and limits of human knowledge." },
-            { term: "Ontological", def: "Relating to the branch of metaphysics dealing with the nature of being." },
-            { term: "Dialectical", def: "Relating to the logical discussion of ideas and opinions." }
+            { term: "Profiling", def: "Analysis of behavioral patterns." },
+            { term: "Contend", def: "To assert a position in an argument." },
+            { term: "Auditing", def: "Official inspection of processes." }
           ],
           questions: [
-            { id: 1, question: "What characterizes contemporary epistemology according to the text?", options: ["A) Strict adherence to ancient dogmas", "B) Deconstruction of foundationalist paradigms and pluralistic justification", "C) Complete abandonment of logic"], correct: 1 },
-            { id: 2, question: "What do philosophers scrutinize in hyper-mediated environments?", options: ["A) The demarcation between empirical validation and constructed reality", "B) Digital file compression formats", "C) Elementary school curriculum"], correct: 0 },
-            { id: 3, question: "What traditional definition of knowledge faces rigorous scrutiny?", options: ["A) Memorized factual data", "B) The tripartite definition of justified true belief", "C) Empirical mathematics"], correct: 1 },
-            { id: 4, question: "What kind of counterexamples challenge standard knowledge definitions?", options: ["A) Gettier-type counterexamples", "B) Algebraic equations", "C) Statistical outliers"], correct: 0 },
-            { id: 5, question: "What does navigating labyrinthine intellectual terrains demand?", options: ["A) Uncompromising commitment to rigorous dialectical analysis", "B) Superficial reading habits", "C) Dogmatic acceptance of theories"], correct: 0 },
-            { id: 6, question: "What is the primary focus of 'Epistemology'?", options: ["A) The study of physical universe origins", "B) The nature, origin, and limits of human knowledge", "C) The laws of planetary motion"], correct: 1 },
-            { id: 7, question: "What does 'Ontological' relate to?", options: ["A) The nature of being and existence", "B) The financial cost of books", "C) The structure of computer languages"], correct: 0 },
-            { id: 8, question: "What is 'Dialectical analysis'?", options: ["A) Logical discussion and critical examination of ideas", "B) Translating texts between languages", "C) Memorizing historical dates"], correct: 0 },
-            { id: 9, question: "How does the passage view human interpretive limitations?", options: ["A) As something to be embraced with a self-correcting appreciation", "B) As flaws that can be permanently eradicated", "C) As irrelevant to philosophy"], correct: 0 },
-            { id: 10, question: "What is the overarching theme of this advanced discourse?", options: ["A) The complexity and shifting nature of knowledge justification", "B) The simplicity of everyday communication", "C) The history of printing presses"], correct: 0 }
+            { id: 1, question: "What is the primary focus of Passage 1?", options: ["A) Computer hardware costs", "B) Ethical debate surrounding algorithmic profiling in justice", "C) History of courts"], correct: 1 },
+            { id: 2, question: "What do proponents claim machine learning minimizes?", options: ["A) Human prejudice and inconsistency", "B) Internet speeds", "C) Taxes"], correct: 0 },
+            { id: 3, question: "What is the main criticism against algorithms?", options: ["A) They process slowly", "B) They are trained on biased datasets", "C) Power usage"], correct: 1 },
+            { id: 4, question: "What do human judges exhibit according to Passage 2?", options: ["A) Perfect precision", "B) Fatigue, emotional bias, and inconsistencies", "C) Immunity"], correct: 1 },
+            { id: 5, question: "What solution do researchers advocate?", options: ["A) Total automation", "B) Rigorous auditing, transparency, and human oversight", "C) Banning computers"], correct: 1 },
+            { id: 6, question: "What does 'Contend' mean?", options: ["A) To agree", "B) To assert a position", "C) To surrender"], correct: 1 },
+            { id: 7, question: "What does 'Auditing' involve?", options: ["A) Official inspection and evaluation", "B) Bankruptcy", "C) Music review"], correct: 0 },
+            { id: 8, question: "How do passages relate?", options: ["A) Refutes completely", "B) Qualifies and offers solutions", "C) Unrelated"], correct: 1 },
+            { id: 9, question: "What illusion does algorithmic neutrality create?", options: ["A) Discrimination is eliminated while persisting", "B) Computers live", "C) Faster trials"], correct: 0 },
+            { id: 10, question: "What is the core objective of SAT reading?", options: ["A) Test analytical reasoning and evidence synthesis", "B) Test fiction", "C) Memorize words"], correct: 0 }
+          ]
+        };
+      case "IELTS":
+      default:
+        return {
+          title: `Day ${day}: Elite IELTS Academic Reading: Urban Megacity Expansion`,
+          text: `IELTS Elite Masterclass: Global urbanization has driven the rise of megacities exceeding ten million residents. Triggered by rural-to-urban migration for employment and education, this phenomenon strains municipal infrastructures, causing acute housing deficits and air pollution. Planners advocate for smart-city frameworks, efficient public transit, and green architecture to ensure sustainable metropolitan evolution and prevent unmitigated urban sprawl.`,
+          vocabulary: [
+            { term: "Agglomeration", def: "An extended collection coming together." },
+            { term: "Precipitate", def: "Cause to happen suddenly." },
+            { term: "Municipal", def: "Relating to city governance." }
+          ],
+          questions: [
+            { id: 1, question: "What defines a megacity?", options: ["A) Over ten million inhabitants", "B) No cars", "C) Glass buildings"], correct: 0 },
+            { id: 2, question: "What is the primary driver of migration?", options: ["A) Farming", "B) Jobs, education, and healthcare", "C) Forced relocation"], correct: 1 },
+            { id: 3, question: "What strain does the influx place on cities?", options: ["A) Strain on municipal services, housing, and traffic", "B) Electricity surplus", "C) Open spaces"], correct: 0 },
+            { id: 4, question: "What solutions do planners emphasize?", options: ["A) Smart-city tech, public transit, and green architecture", "B) Demolishing tall buildings", "C) Stopping migration"], correct: 0 },
+            { id: 5, question: "What risk do cities face if they fail?", options: ["A) Uninhabitable urban sprawls", "B) Farming villages", "C) Sinking"], correct: 0 },
+            { id: 6, question: "What does 'Agglomeration' mean?", options: ["A) Scattered wasteland", "B) An extended collection coming together", "C) Isolated building"], correct: 1 },
+            { id: 7, question: "What does 'Precipitate' mean?", options: ["A) To cause to happen suddenly", "B) To delay", "C) To calculate"], correct: 0 },
+            { id: 8, question: "What does 'Municipal' relate to?", options: ["A) Military", "B) City or town governing bodies", "C) Trade agreements"], correct: 1 },
+            { id: 9, question: "What is the consequence for air quality?", options: ["A) Degraded and polluted", "B) Pristine", "C) Unaffected"], correct: 0 },
+            { id: 10, question: "What is the primary purpose of IELTS Academic reading?", options: ["A) Evaluate academic comprehension of global phenomena", "B) Entertain", "C) Teach alphabet"], correct: 0 }
           ]
         };
     }
@@ -168,7 +186,6 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
 
   const handleOptionSelect = (qId: number, optIndex: number) => {
     if (isSubmitted) return;
-    // Eğer istifadəçi artıq seçdiyi varianta bir də klikləyirsə, cavabı ləğv et (boşalt)
     if (selectedAnswers[qId] === optIndex) {
       const updated = { ...selectedAnswers };
       delete updated[qId];
@@ -181,14 +198,10 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
   const handleSubmitTest = () => {
     let correctCount = 0;
     currentData.questions.forEach((q) => {
-      if (selectedAnswers[q.id] === q.correct) {
-        correctCount++;
-      }
+      if (selectedAnswers[q.id] === q.correct) correctCount++;
     });
-
     setScore(correctCount);
     setIsSubmitted(true);
-
     if (correctCount >= 7 && !completedDays.includes(activeDay)) {
       const updated = [...completedDays, activeDay];
       setCompletedDays(updated);
@@ -196,16 +209,8 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
     }
   };
 
-  const handleRetry = () => {
-    setIsSubmitted(false);
-    setSelectedAnswers({});
-  };
-
-  const handleNextDay = () => {
-    setIsSubmitted(false);
-    setSelectedAnswers({});
-    setActiveDay(activeDay + 1);
-  };
+  const handleRetry = () => { setIsSubmitted(false); setSelectedAnswers({}); };
+  const handleNextDay = () => { setIsSubmitted(false); setSelectedAnswers({}); setActiveDay(activeDay + 1); };
 
   return (
     <main className="min-h-screen bg-slate-950 text-white p-6 md:p-16 font-sans">
@@ -213,7 +218,7 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
         <div className="flex justify-between items-center bg-slate-900 p-6 rounded-3xl border border-white/10 shadow-xl">
           <Link href="/" className="text-blue-400 font-bold hover:underline text-sm">← Main Menu</Link>
           <h1 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
-            {level} Level • Reading Module
+            {isSpecialExam ? `${level} Elite Preparation Panel` : `${level} Level • Reading Module`}
           </h1>
         </div>
 
@@ -223,11 +228,7 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
               currentLevel={level} 
               completedDays={completedDays} 
               activeDay={activeDay} 
-              onSelectDay={(day: number) => {
-                setActiveDay(day);
-                setIsSubmitted(false);
-                setSelectedAnswers({});
-              }} 
+              onSelectDay={(day: number) => { setActiveDay(day); setIsSubmitted(false); setSelectedAnswers({}); }} 
             />
           </div>
 
@@ -240,12 +241,12 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
                 </span>
               </div>
               
-              <div className="text-gray-300 text-sm md:text-base leading-relaxed">
+              <div className="text-gray-300 text-sm md:text-base leading-relaxed space-y-4">
                 <p>{currentData.text}</p>
               </div>
 
               <div className="bg-slate-950/60 p-6 rounded-2xl border border-white/5 space-y-3">
-                <h3 className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider">Vocabulary & Expressions:</h3>
+                <h3 className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider">Advanced Vocabulary & Lexicon:</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {currentData.vocabulary.map((vocab, idx) => (
                     <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 text-xs space-y-1">
@@ -259,16 +260,14 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
 
             <div className="p-8 bg-slate-900 rounded-3xl border border-white/10 space-y-8 shadow-2xl">
               <div className="border-b border-white/10 pb-4">
-                <h3 className="text-xl font-bold">10-Question Reading Test</h3>
-                <p className="text-xs text-gray-400 mt-1">You need at least 7 correct answers to unlock the next day. (Click selected option again to deselect).</p>
+                <h3 className="text-xl font-bold">10-Question Comprehensive Test</h3>
+                <p className="text-xs text-gray-400 mt-1">Score at least 7 correct answers to unlock the next day.</p>
               </div>
 
               <div className="space-y-6">
                 {currentData.questions.map((q, qIndex) => (
                   <div key={q.id} className="p-5 bg-slate-950/60 rounded-2xl border border-white/5 space-y-3">
-                    <p className="text-sm font-bold text-gray-200">
-                      {qIndex + 1}. {q.question}
-                    </p>
+                    <p className="text-sm font-bold text-gray-200">{qIndex + 1}. {q.question}</p>
                     <div className="grid grid-cols-1 gap-2">
                       {q.options.map((opt, optIndex) => {
                         const isSelected = selectedAnswers[q.id] === optIndex;
@@ -277,10 +276,8 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
                             key={optIndex}
                             disabled={isSubmitted}
                             onClick={() => handleOptionSelect(q.id, optIndex)}
-                            className={`p-3 rounded-xl text-xs font-bold text-left transition border ${
-                              isSelected
-                                ? "bg-blue-600 border-blue-400 text-white shadow-md"
-                                : "bg-white/5 border-white/10 text-gray-300 hover:border-blue-500/50"
+                            className={`p-3 rounded-xl text-xs font-bold text-left transition border cursor-pointer ${
+                              isSelected ? "bg-blue-600 border-blue-400 text-white shadow-md" : "bg-white/5 border-white/10 text-gray-300 hover:border-blue-500/50"
                             }`}
                           >
                             {opt}
@@ -293,36 +290,19 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
               </div>
 
               {!isSubmitted ? (
-                <button
-                  onClick={handleSubmitTest}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-black text-sm hover:opacity-90 transition shadow-xl"
-                >
+                <button onClick={handleSubmitTest} className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-black text-sm hover:opacity-90 transition shadow-xl cursor-pointer">
                   Submit Answers
                 </button>
               ) : (
                 <div className="p-6 bg-slate-950 rounded-2xl border border-white/10 text-center space-y-4">
-                  <p className="text-lg font-bold">
-                    Your Score: <span className={score >= 7 ? "text-green-400" : "text-yellow-400"}>{score} / 10</span>
-                  </p>
+                  <p className="text-lg font-bold">Your Score: <span className={score >= 7 ? "text-green-400" : "text-yellow-400"}>{score} / 10</span></p>
                   <p className="text-xs text-gray-400">
-                    {score >= 7 
-                      ? "🎉 Congratulations! You successfully passed this day and unlocked the next one." 
-                      : "⚠️ You scored less than 7. You can retry the test to improve your score!"}
+                    {score >= 7 ? "🎉 Congratulations! Unlocked next day." : "⚠️ Score below 7. Retry to improve!"}
                   </p>
                   <div className="flex justify-center gap-4 pt-2">
-                    <button
-                      onClick={handleRetry}
-                      className="px-6 py-3 rounded-xl bg-slate-800 text-white font-bold text-xs hover:bg-slate-700 transition shadow-lg border border-white/10"
-                    >
-                      🔄 Retry Test
-                    </button>
+                    <button onClick={handleRetry} className="px-6 py-3 rounded-xl bg-slate-800 text-white font-bold text-xs hover:bg-slate-700 transition border border-white/10 cursor-pointer">🔄 Retry Test</button>
                     {score >= 7 && activeDay < 60 && (
-                      <button
-                        onClick={handleNextDay}
-                        className="px-6 py-3 rounded-xl bg-green-600 text-white font-bold text-xs hover:bg-green-500 transition shadow-lg"
-                      >
-                        Next Day (Day {activeDay + 1}) →
-                      </button>
+                      <button onClick={handleNextDay} className="px-6 py-3 rounded-xl bg-green-600 text-white font-bold text-xs hover:bg-green-500 transition cursor-pointer">Next Day →</button>
                     )}
                   </div>
                 </div>
