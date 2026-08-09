@@ -40,7 +40,7 @@ export default function ExamHubPage() {
   const readingQuestions = [
     {
       id: "r1",
-      passage: "IELTS-Simon Style Passage: Urban migration trends indicate a significant shift towards smart metropolitan hubs. Economists from Engovate research note that digital infrastructure dictates regional growth.",
+      passage: "Urban migration trends indicate a significant shift towards smart metropolitan hubs. Economists note that robust digital infrastructure dictates regional economic growth.",
       question: "According to the passage, what primarily dictates regional economic growth?",
       options: ["Agricultural output", "Digital infrastructure", "Traditional manufacturing", "Population density alone"],
       correct: 1
@@ -50,8 +50,8 @@ export default function ExamHubPage() {
   const listeningQuestions = [
     {
       id: "l1",
-      audioNote: "IELTS.liz Audio Simulation: 'In this listening section, we analyze corporate leadership changes and academic discourse standards.'",
-      question: "What is the primary subject of the audio lecture according to IELTS.liz standards?",
+      audioNote: "Audio Simulation Track: 'In this section, we analyze corporate leadership changes and academic discourse standards.'",
+      question: "What is the primary subject of the audio lecture?",
       options: ["Corporate leadership and academic discourse", "Wildlife preservation", "Ancient architecture", "Marine biology"],
       correct: 0
     }
@@ -77,64 +77,64 @@ export default function ExamHubPage() {
     setExamStarted(false);
 
     setLeaderboard((prev) => [
-      { name: userName || "Student", level: level, score: score, progress: "Active" },
+      { name: userName || "Tələbə", level: level, score: score, progress: "Aktiv" },
       ...prev
     ].sort((a, b) => b.score - a.score));
   };
 
   if (authView !== "app") {
     return (
-      <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-6 font-sans">
-        <div className="w-full max-w-md p-8 bg-slate-900 rounded-3xl border border-white/10 space-y-6 shadow-2xl">
+      <main className="min-h-screen bg-[#0f172a] text-white flex items-center justify-center p-6 font-sans">
+        <div className="w-full max-w-md p-8 bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-white/10 space-y-6 shadow-2xl">
           <div className="text-center space-y-2">
-            <span className="px-3 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30 uppercase">
-              Elite Language Academy
+            <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20 uppercase tracking-widest">
+              Elite Academy
             </span>
             <h1 className="text-2xl font-black text-white">
-              {authView === "login" ? "Welcome Back" : "Create Account"}
+              {authView === "login" ? "Xoş Gəlmisiniz" : "Hesab Yarat"}
             </h1>
-            <p className="text-xs text-gray-400">Sign in to access your placement results and leaderboard.</p>
+            <p className="text-xs text-gray-400">Səviyyə imtahanına başlamaq və liderlər lövhəsinə qoşulmaq üçün daxil olun.</p>
           </div>
 
           <div className="space-y-4">
             {authView === "signup" && (
               <div>
-                <label className="text-xs font-bold text-gray-300 block mb-1">Full Name</label>
+                <label className="text-xs font-bold text-gray-300 block mb-1">Ad və Soyad</label>
                 <input
                   type="text"
-                  placeholder="e.g. John Doe"
+                  placeholder="Məs: Əli Məmmədov"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
-                  className="w-full p-4 bg-slate-950 rounded-2xl border border-white/10 text-sm text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full p-4 bg-slate-950 rounded-2xl border border-white/10 text-sm text-white focus:outline-none focus:border-emerald-500 transition"
                 />
               </div>
             )}
             <div>
-              <label className="text-xs font-bold text-gray-300 block mb-1">Email Address</label>
+              <label className="text-xs font-bold text-gray-300 block mb-1">Elektron Poçt</label>
               <input
                 type="email"
-                placeholder="student@domain.com"
+                placeholder="ornek@domain.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-4 bg-slate-950 rounded-2xl border border-white/10 text-sm text-white focus:outline-none focus:border-emerald-500"
+                className="w-full p-4 bg-slate-950 rounded-2xl border border-white/10 text-sm text-white focus:outline-none focus:border-emerald-500 transition"
               />
             </div>
             <div>
-              <label className="text-xs font-bold text-gray-300 block mb-1">Password</label>
+              <label className="text-xs font-bold text-gray-300 block mb-1">Şifrə</label>
               <input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-4 bg-slate-950 rounded-2xl border border-white/10 text-sm text-white focus:outline-none focus:border-emerald-500"
+                className="w-full p-4 bg-slate-950 rounded-2xl border border-white/10 text-sm text-white focus:outline-none focus:border-emerald-500 transition"
               />
             </div>
 
             <button
               onClick={() => setAuthView("app")}
-              className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider transition shadow-lg"
+              className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider transition shadow-[0_0_30px_-5px_rgba(16,185,129,0.4)]"
             >
-              {authView === "login" ? "Sign In 🚀" : "Register & Start 🚀"}
+              {authView === "login" ? "Daxil Ol 🚀" : "Qeydiyyatdan Keç 🚀"}
             </button>
           </div>
 
@@ -143,7 +143,7 @@ export default function ExamHubPage() {
               onClick={() => setAuthView(authView === "login" ? "signup" : "login")}
               className="text-xs text-emerald-400 hover:underline font-semibold"
             >
-              {authView === "login" ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+              {authView === "login" ? "Hesabınız yoxdur? Qeydiyyatdan keçin" : "Artıq hesabınız var? Daxil olun"}
             </button>
           </div>
         </div>
@@ -152,57 +152,57 @@ export default function ExamHubPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-6 md:p-16 font-sans">
+    <main className="min-h-screen bg-[#0f172a] text-white p-6 md:p-16 font-sans">
       <div className="max-w-4xl mx-auto space-y-8">
         
-        <div className="flex justify-between items-center border-b border-white/10 pb-6">
+        <div className="flex justify-between items-center border-b border-white/5 pb-6">
           <div>
-            <span className="px-3 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30 uppercase">
-              Secure Certification Hub
+            <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20 uppercase tracking-widest">
+              Sertifikasiya Mərkəzi
             </span>
-            <h1 className="text-2xl md:text-4xl font-black mt-2 text-white">
-              Mandatory 30-Min Placement & Leaderboard
+            <h1 className="text-2xl md:text-3xl font-black mt-2 text-white">
+              Yerləşdirmə İmtahanı və Reytinq
             </h1>
           </div>
           <Link
             href="/"
             className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-bold text-xs border border-white/10 transition"
           >
-            ← Main Menu
+            ← Əsas Səhifə
           </Link>
         </div>
 
         {!examStarted && !placementCompleted && (
-          <div className="p-8 bg-slate-900 rounded-3xl border border-white/10 space-y-6 shadow-2xl text-center">
-            <h3 className="text-2xl font-black text-white">Mandatory Level Placement Test</h3>
-            <p className="text-xs text-gray-400 max-w-xl mx-auto">
-              You cannot access free modules without taking the initial 30-minute placement exam. This test includes authentic IELTS Reading & Listening items compiled from Engovate, IELTS.liz, and IELTS-Simon.
+          <div className="p-10 bg-slate-900/50 rounded-3xl border border-white/5 space-y-6 shadow-xl text-center backdrop-blur-md">
+            <h3 className="text-2xl font-black text-white">Məcburi Səviyyə İmtahanı</h3>
+            <p className="text-sm text-gray-400 max-w-xl mx-auto leading-relaxed">
+              Tədris proqramına uyğunlaşmaq üçün 30 dəqiqəlik ilkin səviyyə yoxlamasından keçməlisiniz. Bu test oxuma və dinləmə bacarıqlarınızı qiymətləndirir.
             </p>
             <button
               onClick={() => setExamStarted(true)}
-              className="px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs uppercase tracking-wider hover:opacity-90 transition shadow-lg"
+              className="px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs uppercase tracking-wider hover:opacity-90 transition shadow-[0_0_30px_-5px_rgba(16,185,129,0.4)]"
             >
-              Start 30-Min Placement Exam Now 🚀
+              İmtahana İndi Başla 🚀
             </button>
           </div>
         )}
 
         {examStarted && !placementCompleted && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center bg-slate-900 p-6 rounded-3xl border border-white/10 shadow-xl">
+            <div className="flex justify-between items-center bg-slate-900/50 p-6 rounded-3xl border border-white/5 shadow-xl">
               <div>
-                <span className="text-xs text-emerald-400 font-bold uppercase">Section: {currentSection.toUpperCase()}</span>
-                <h2 className="text-lg font-black text-white">IELTS / Engovate Standard Evaluation</h2>
+                <span className="text-xs text-emerald-400 font-bold uppercase tracking-wider">Bölmə: {currentSection.toUpperCase()}</span>
+                <h2 className="text-lg font-black text-white">Akademik Qiymətləndirmə</h2>
               </div>
-              <div className="px-4 py-2 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black text-xs">
-                ⏳ Time Left: {formatTime(timeLeft)}
+              <div className="px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 font-black text-xs">
+                ⏳ Qalan Vaxt: {formatTime(timeLeft)}
               </div>
             </div>
 
             {currentSection === "reading" ? (
-              <div className="p-6 bg-slate-900 rounded-3xl border border-white/10 space-y-6 shadow-xl">
-                <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/5 text-sm text-gray-300">
-                  <span className="block text-xs font-bold text-emerald-400 mb-1">READING PASSAGE (IELTS.Simon Style):</span>
+              <div className="p-8 bg-slate-900/50 rounded-3xl border border-white/5 space-y-6 shadow-xl">
+                <div className="p-5 bg-slate-950/80 rounded-2xl border border-white/5 text-sm text-gray-300 leading-relaxed">
+                  <span className="block text-xs font-bold text-emerald-400 mb-2">OXUMA MƏTNİ:</span>
                   {readingQuestions[0].passage}
                 </div>
                 <h4 className="text-sm font-black text-white">1. {readingQuestions[0].question}</h4>
@@ -212,7 +212,9 @@ export default function ExamHubPage() {
                       key={idx}
                       onClick={() => handleSelect("r1", idx)}
                       className={`p-4 rounded-2xl text-left text-xs border transition ${
-                        selectedOptions["r1"] === idx ? "bg-emerald-600/30 border-emerald-500 text-emerald-200" : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10"
+                        selectedOptions["r1"] === idx 
+                          ? "bg-emerald-600/20 border-emerald-500 text-emerald-200" 
+                          : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10"
                       }`}
                     >
                       {opt}
@@ -221,15 +223,15 @@ export default function ExamHubPage() {
                 </div>
                 <button
                   onClick={() => setCurrentSection("listening")}
-                  className="px-6 py-3 rounded-2xl bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider"
+                  className="px-6 py-3 rounded-2xl bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider hover:bg-emerald-500 transition"
                 >
-                  Proceed to Listening Section →
+                  Dinləmə Bölməsinə Keç →
                 </button>
               </div>
             ) : (
-              <div className="p-6 bg-slate-900 rounded-3xl border border-white/10 space-y-6 shadow-xl">
-                <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/5 text-sm text-gray-300">
-                  <span className="block text-xs font-bold text-emerald-400 mb-1">LISTENING TRACK NOTE (IELTS.liz Standard):</span>
+              <div className="p-8 bg-slate-900/50 rounded-3xl border border-white/5 space-y-6 shadow-xl">
+                <div className="p-5 bg-slate-950/80 rounded-2xl border border-white/5 text-sm text-gray-300 leading-relaxed">
+                  <span className="block text-xs font-bold text-emerald-400 mb-2">DİNLƏMƏ QEYDİ:</span>
                   {listeningQuestions[0].audioNote}
                 </div>
                 <h4 className="text-sm font-black text-white">2. {listeningQuestions[0].question}</h4>
@@ -239,25 +241,27 @@ export default function ExamHubPage() {
                       key={idx}
                       onClick={() => handleSelect("l1", idx)}
                       className={`p-4 rounded-2xl text-left text-xs border transition ${
-                        selectedOptions["l1"] === idx ? "bg-emerald-600/30 border-emerald-500 text-emerald-200" : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10"
+                        selectedOptions["l1"] === idx 
+                          ? "bg-emerald-600/20 border-emerald-500 text-emerald-200" 
+                          : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10"
                       }`}
                     >
                       {opt}
                     </button>
                   ))}
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between pt-4">
                   <button
                     onClick={() => setCurrentSection("reading")}
-                    className="px-6 py-3 rounded-2xl bg-white/5 text-gray-300 font-bold text-xs border border-white/10"
+                    className="px-6 py-3 rounded-2xl bg-white/5 text-gray-300 font-bold text-xs border border-white/10 hover:bg-white/10"
                   >
-                    ← Back to Reading
+                    ← Oxumaya Qayıt
                   </button>
                   <button
                     onClick={handleFinishPlacement}
-                    className="px-8 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs uppercase tracking-wider shadow-lg"
+                    className="px-8 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs uppercase tracking-wider shadow-lg hover:opacity-90 transition"
                   >
-                    Finish & Get Assigned Level 🚀
+                    İmtahanı Bitir və Nəticəni Al 🚀
                   </button>
                 </div>
               </div>
@@ -267,41 +271,41 @@ export default function ExamHubPage() {
 
         {placementCompleted && (
           <div className="space-y-8">
-            <div className="p-8 bg-slate-900 rounded-3xl border border-emerald-500/40 space-y-4 shadow-2xl text-center">
-              <span className="px-3 py-1 rounded-xl bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30 uppercase">
-                Evaluation Complete
+            <div className="p-10 bg-slate-900/50 rounded-3xl border border-emerald-500/30 space-y-4 shadow-2xl text-center backdrop-blur-md">
+              <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20 uppercase tracking-widest">
+                Qiymətləndirmə Tamamlandı
               </span>
-              <h2 className="text-3xl font-black text-white">Your Official Level: {assignedLevel}</h2>
-              <p className="text-xs text-gray-400 max-w-md mx-auto">
-                Based on your rigorous 30-minute IELTS/Engovate evaluation, your curriculum has been automatically generated for level <span className="text-emerald-400 font-bold">{assignedLevel}</span>.
+              <h2 className="text-3xl font-black text-white">Sizin Səviyyəniz: {assignedLevel}</h2>
+              <p className="text-xs text-gray-400 max-w-md mx-auto leading-relaxed">
+                İmtahan nəticələrinizə əsasən 60 günlük tədris proqramınız <span className="text-emerald-400 font-bold">{assignedLevel}</span> səviyyəsinə uyğunlaşdırıldı.
               </p>
               <Link
                 href={`/reading/${assignedLevel.toLowerCase()}`}
-                className="inline-block mt-4 px-8 py-4 rounded-2xl bg-emerald-600 text-white font-black text-xs uppercase tracking-wider shadow-lg hover:bg-emerald-500 transition"
+                className="inline-block mt-4 px-8 py-4 rounded-2xl bg-emerald-600 text-white font-black text-xs uppercase tracking-wider shadow-[0_0_30px_-5px_rgba(16,185,129,0.4)] hover:bg-emerald-500 transition"
               >
-                Enter Your {assignedLevel} Curriculum 🚀
+                {assignedLevel} Proqramına Daxil Ol 🚀
               </Link>
             </div>
 
-            <div className="p-8 bg-slate-900 rounded-3xl border border-white/10 space-y-6 shadow-2xl">
+            <div className="p-8 bg-slate-900/50 rounded-3xl border border-white/5 space-y-6 shadow-xl backdrop-blur-md">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-xl font-black text-white">Global Student Leaderboard</h3>
-                  <p className="text-xs text-gray-400">Compete with peers, track personal growth. Monthly Top 3 win elite certificates!</p>
+                  <h3 className="text-xl font-black text-white">Qlobal Tələbə Reytinqi</h3>
+                  <p className="text-xs text-gray-400">Digər tələbələrlə yarışın, aylıq nəticələrə görə hədiyyələr qazanın.</p>
                 </div>
-                <span className="px-3 py-1 rounded-xl bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
-                  🏆 Monthly Rewards Active
+                <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/20">
+                  🏆 Aylıq Mükafatlar Aktivdir
                 </span>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-white/10 text-xs text-gray-400 uppercase">
-                      <th className="py-3 px-4">Rank</th>
-                      <th className="py-3 px-4">Student Name</th>
-                      <th className="py-3 px-4">Level</th>
-                      <th className="py-3 px-4">Score</th>
+                    <tr className="border-b border-white/5 text-xs text-gray-400 uppercase tracking-wider">
+                      <th className="py-3 px-4">Yer</th>
+                      <th className="py-3 px-4">Tələbə</th>
+                      <th className="py-3 px-4">Səviyyə</th>
+                      <th className="py-3 px-4">Bal</th>
                       <th className="py-3 px-4">Status</th>
                     </tr>
                   </thead>
@@ -310,8 +314,8 @@ export default function ExamHubPage() {
                       <tr key={idx} className={idx < 3 ? "bg-emerald-500/5 font-bold" : ""}>
                         <td className="py-4 px-4 text-emerald-400">#{idx + 1} {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : ""}</td>
                         <td className="py-4 px-4 text-white">{student.name}</td>
-                        <td className="py-4 px-4"><span className="px-2 py-1 rounded bg-white/10 text-xs">{student.level}</span></td>
-                        <td className="py-4 px-4 text-purple-300">{student.score} pts</td>
+                        <td className="py-4 px-4"><span className="px-2 py-1 rounded bg-white/5 text-xs border border-white/5">{student.level}</span></td>
+                        <td className="py-4 px-4 text-emerald-400">{student.score} xal</td>
                         <td className="py-4 px-4 text-xs text-gray-400">{student.progress}</td>
                       </tr>
                     ))}
