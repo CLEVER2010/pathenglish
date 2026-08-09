@@ -11,56 +11,56 @@ interface ListeningTask {
 const listeningData: Record<string, ListeningTask[]> = {
   a1: [
     {
-      title: "English with Alex: Basic Listening Practice",
-      source: "English with Alex",
-      duration: "3 min",
-      embedId: "w_c4R3AInLg",
-      transcript: "Hello! Welcome to basic English listening practice. Listen carefully to each sentence.",
+      title: "English Practice: Daily Conversations for Beginners",
+      source: "Basic English Listening",
+      duration: "4 min",
+      embedId: "juKd26qkNAw",
+      transcript: "Listen to everyday greetings, introductions, and simple questions spoken clearly.",
     },
   ],
   a2: [
     {
-      title: "BBC 6 Minute English: Daily Habits",
+      title: "BBC 6 Minute English: Improving Memory Habits",
       source: "BBC Learning English",
       duration: "6 min",
-      embedId: "w_c4R3AInLg",
-      transcript: "Welcome to 6 Minute English. Today we discuss how small habits change your lifestyle.",
+      embedId: "L9A00juA2G0",
+      transcript: "Discover practical tips from BBC hosts on how small lifestyle changes boost brain performance.",
     },
   ],
   b1: [
     {
-      title: "TED-Ed: How to learn any language in 6 months",
+      title: "TED-Ed: How the brain learns languages",
       source: "TED-Ed",
       duration: "5 min",
-      embedId: "o_HAXan1vgE",
-      transcript: "Language learning is about immersion, consistency, and active practice every single day.",
+      embedId: "3yX9Jm8JmEE",
+      transcript: "An animated overview of neural pathways involved in acquiring second languages.",
     },
   ],
   b1plus: [
     {
-      title: "Academic Listening: IELTS Listening Strategies",
-      source: "PathEnglish Academy",
-      duration: "7 min",
-      embedId: "o_HAXan1vgE",
-      transcript: "Focus on keywords and predictions before the audio clip starts playing.",
+      title: "TED-Ed: How to read faster and retain more",
+      source: "TED-Ed Academic",
+      duration: "6 min",
+      embedId: "12345678900", // placeholder safe embed
+      transcript: "Explore speed-reading techniques and cognitive strategies to comprehend dense texts under exam pressure.",
     },
   ],
   b2: [
     {
-      title: "TEDx: The Secret to Speaking Fast English",
+      title: "TEDx: The Secret to Language Fluency",
       source: "TEDx Talks",
-      duration: "8 min",
-      embedId: "o_HAXan1vgE",
-      transcript: "Connected speech and reduction patterns are key factors in native-level listening fluency.",
+      duration: "10 min",
+      embedId: "iG9CE55wbtY",
+      transcript: "Insights into overcoming language learning plateaus through active immersion and shadowing.",
     },
   ],
   c1: [
     {
-      title: "Advanced Lecture: Cognitive Science & Fluency",
-      source: "Global Academic Talks",
-      duration: "10 min",
-      embedId: "o_HAXan1vgE",
-      transcript: "Neuroplasticity allows adults to acquire native-like proficiency through targeted auditory training.",
+      title: "TED-Ed: The science of decision making",
+      source: "TED-Ed Advanced",
+      duration: "8 min",
+      embedId: "dItUGF8GdTw",
+      transcript: "An examination of cognitive biases and logical frameworks in high-stakes reasoning.",
     },
   ],
 };
@@ -72,7 +72,7 @@ export default async function ListeningLevelPage({
 }) {
   const resolvedParams = await params;
   const levelKey = resolvedParams.level.toLowerCase();
-  const tasks = listeningData[levelKey] || listeningData["b1"];
+  const tasks = listeningData[levelKey] || listeningData["b1plus"];
 
   return (
     <main className="min-h-screen bg-slate-950 text-white p-6 md:p-12 font-sans">
@@ -87,7 +87,7 @@ export default async function ListeningLevelPage({
           </span>
           <h1 className="text-3xl md:text-4xl font-black mt-3">🎧 Listening & Video Məşqləri</h1>
           <p className="text-gray-400 text-sm mt-1">
-            BBC, TED-Ed və Alex-dən seçilmiş audio-videolar.
+            BBC və TED-Ed videoları ilə dinləmə bacarıqlarını inkişaf etdir.
           </p>
         </div>
 
@@ -97,8 +97,9 @@ export default async function ListeningLevelPage({
               <div className="aspect-video w-full rounded-2xl overflow-hidden border border-white/10">
                 <iframe
                   className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${task.embedId}`}
+                  src={`https://www.youtube-nocookie.com/embed/${task.embedId}`}
                   title={task.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
               </div>
@@ -111,7 +112,7 @@ export default async function ListeningLevelPage({
               <h2 className="text-2xl font-bold">{task.title}</h2>
 
               <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                <h3 className="text-xs font-bold text-gray-400 uppercase mb-2">Transkript / Qısa Mətn:</h3>
+                <h3 className="text-xs font-bold text-gray-400 uppercase mb-2">Transkript / Qısa İzah:</h3>
                 <p className="text-gray-300 text-sm leading-relaxed">{task.transcript}</p>
               </div>
             </div>
