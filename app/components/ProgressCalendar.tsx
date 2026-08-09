@@ -14,7 +14,7 @@ export default function ProgressCalendar({
   onSelectDay,
 }: CalendarProps) {
   const totalDays = 60;
-  const maxUnlockedDay = Math.max(...completedDays, 0) + 1;
+  const maxUnlockedDay = completedDays.length > 0 ? Math.max(...completedDays) + 1 : 1;
   const progressPercent = Math.round((completedDays.length / totalDays) * 100);
 
   return (
@@ -63,14 +63,6 @@ export default function ProgressCalendar({
             </button>
           );
         })}
-      </div>
-
-      <div className="text-xs text-gray-400 bg-white/5 p-4 rounded-2xl border border-white/5 leading-relaxed">
-        {completedDays.length === totalDays ? (
-          <span className="text-green-400 font-bold">🎉 Təbriklər! Bütün günlər bitdi, imtahan açıldı!</span>
-        ) : (
-          <span>💡 <strong className="text-white">Sistem Qaydası:</strong> Növbəti günə keçmək üçün cari günün dərslərini oxuyub 10 suallıq testi tamamlamalısan.</span>
-        )}
       </div>
     </div>
   );
