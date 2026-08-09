@@ -2,7 +2,12 @@
 import { useState } from "react";
 import { LessonData } from "@/types";
 
-export default function InteractiveLessonView({ lesson }: { lesson: LessonData }) {
+interface InteractiveViewProps {
+  lesson: LessonData;
+  onLessonComplete: (day: number) => void;
+}
+
+export default function InteractiveLessonView({ lesson, onLessonComplete }: InteractiveViewProps) {
   const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
   const [showResults, setShowResults] = useState(false);
 
@@ -18,13 +23,20 @@ export default function InteractiveLessonView({ lesson }: { lesson: LessonData }
     return correct;
   };
 
+  const handleCheckResults = () => {
+    setShowResults(true);
+    // Sistem qərar verir: Test yoxlanıldı və gün avtomatik tamamlandı
+    onLessonComplete(lesson.day);
+  };
+
   return (
     <div className="space-y-8">
-      {/* Əsas Mətn / Transkript */}
-      <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 md:p-8 space-y-6">
+      <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 md:p-8 space-y-6 shadow-xl">
         <div className="flex justify-between items-center text-xs text-gray-400">
           <span className="font-semibold text-blue-400">{lesson.source}</span>
-          <span>Gün {lesson.day} / 60</span>
+          <span className="bg-blue-500/20 px-3 py-1 rounded-full text-blue-300 font-bold">
+            Gün {lesson.day} / 60
+          </span>
         </div>
 
         <h1 className="text-2xl md:text-3xl font-black text-white">{lesson.title}</h1>
@@ -47,8 +59,7 @@ export default function InteractiveLessonView({ lesson }: { lesson: LessonData }
         </div>
       </div>
 
-      {/* Collocations & Definition Kartları */}
-      <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 md:p-8">
+      <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 md:p-8 shadow-xl">
         <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
           📚 Collocations & Definitions (Əsas Sözlər)
         </h2>
@@ -76,10 +87,9 @@ export default function InteractiveLessonView({ lesson }: { lesson: LessonData }
         </div>
       </div>
 
-      {/* True/False & IELTS Test Modulu */}
-      <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 md:p-8 space-y-6">
+      <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 md:p-8 space-y-6 shadow-xl">
         <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          ✍️ Özünü Yoxla (True/False & Multiple Choice)
+          ✍️ Özünü Yoxla (Test Modulu)
         </h2>
 
         <div className="space-y-6">
@@ -126,14 +136,15 @@ export default function InteractiveLessonView({ lesson }: { lesson: LessonData }
         <div className="flex justify-between items-center pt-4 border-t border-white/10">
           {!showResults ? (
             <button
-              onClick={() => setShowResults(true)}
-              className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition"
+              onClick={handleCheckResults}
+              className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition shadow-lg shadow-blue-500/20"
             >
-              Nəticəni Yoxla
+              Nəticəni Yoxla və Dərsi Tamamla
             </button>
           ) : (
-            <div className="text-sm font-bold text-green-400">
-              Nəticəniz: {calculateScore()} / {lesson.quiz.length} Düzgün
+            <div className="text-sm font-bold text-green-400 flex items-center gap-2">
+              <span>✅ Nəticəniz: {calculateScore()} / {lesson.quiz.length} Düzgün</span>
+              <span className="text-xs text-gray-400 font-normal">(Bu gün sistem tərəfindən avtomatik tamamlandı!)</span>
             </div>
           )}
         </div>

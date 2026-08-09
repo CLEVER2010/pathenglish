@@ -6,68 +6,54 @@ import InteractiveLessonView from "@/app/components/InteractiveLessonView";
 import ProgressCalendar from "@/app/components/ProgressCalendar";
 import { LessonData } from "@/types";
 
-const sampleLesson: LessonData = {
-  id: "b1-day-1",
-  level: "B1",
-  day: 1,
-  title: "The Science of Habit Formation & Learning",
-  source: "BBC Learning English / Cathoven Academic",
+// Nümunə olaraq müxtəlif günlər üçün dinamik dərslər simulyasiyası
+const getLessonForDay = (day: number, level: string): LessonData => ({
+  id: `${level.toLowerCase()}-day-${day}`,
+  level: level,
+  day: day,
+  title: `Day ${day}: Advanced English Learning & Vocabulary`,
+  source: "BBC Learning English / Academic Source",
   audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
   paragraphs: [
-    "Forming a new habit takes time and repetition. Scientists believe it takes about two months for a new behavior to become automatic. Small changes, like learning five new English words every day, create huge results over time.",
-    "Instead of trying to master everything at once, focus on one small task. Listen to a short audio clip during your morning commute or before sleeping. Consistency is far more powerful than cramming for hours once a week."
+    `Bu, ${level} səviyyəsinin ${day}-ci gününə aid olan dərs mətnidir. Hər gün yeni biliklər əldə edərək irəliləyirsiniz.`,
+    "Davamlı oxumaq və dinləmək ingilis dilini beyninizdə avtomatikləşdirmək üçün ən əsas üsuldur."
   ],
   vocabulary: [
     {
-      word: "Consistency",
-      collocation: "maintain consistency / show consistency",
-      definition: "The quality of always performing in a similar way or of always happening in a similar way.",
-      azMeaning: "Davamlılıq / Ardıcıllıq"
-    },
-    {
-      word: "Commute",
-      collocation: "daily commute / morning commute",
-      definition: "A regular journey of some distance to and from one's place of work or study.",
-      azMeaning: "İşə/dərsə gedib-gəlmə yolu"
-    },
-    {
-      word: "Automatic",
-      collocation: "become automatic / automatic response",
-      definition: "Done or occurring spontaneously, without conscious thought.",
-      azMeaning: "Avtomatik / Özlüyündən"
+      word: `Word Day ${day}`,
+      collocation: `practice day ${day} / learn daily`,
+      definition: "An important term or phrase used in context to enhance fluency.",
+      azMeaning: `Gün ${day} Sözü`
     }
   ],
   quiz: [
     {
       id: 1,
-      question: "It takes around two months for a new habit to become automatic.",
+      question: `Consistent daily practice is essential for mastering level ${level}.`,
       options: ["True", "False", "Not Given"],
       correctAnswer: 0,
-      explanation: "Mətndə qeyd olunur ki, alimlərin fikrincə yeni vərdişin avtomatikləşməsi təxminən 2 ay çəkir."
-    },
-    {
-      id: 2,
-      question: "Cramming for hours once a week is better than daily consistent study.",
-      options: ["True", "False", "Not Given"],
-      correctAnswer: 1,
-      explanation: "Mətndə bildirilir ki, davamlılıq (consistency) həftədə bir dəfə saatlarla oxumaqdan daha güclüdür."
+      explanation: "Hər gün ardıcıl məşq etmək dili mənimsəmək üçün əsas şərtir."
     }
   ]
-};
+});
 
 export default function ReadingLevelPage({
   params,
 }: {
   params: { level: string };
 }) {
-  const [completedDays, setCompletedDays] = useState<number[]>([1]);
   const level = params?.level ? params.level.toUpperCase() : "B1";
+  const [activeDay, setActiveDay] = useState<number>(1);
+  const [completedDays, setCompletedDays] = useState<number[]>([]);
 
-  const handleSelectDay = (day: number) => {
+  // Şagird test bitirdikdə sistem tərəfindən avtomatik çağrılır
+  const handleLessonComplete = (day: number) => {
     if (!completedDays.includes(day)) {
-      setCompletedDays([...completedDays, day]);
+      setCompletedDays((prev) => [...prev, day]);
     }
   };
+
+  const currentLesson = getLessonForDay(activeDay, level);
 
   return (
     <main className="min-h-screen bg-slate-950 text-white p-6 md:p-12 font-sans">
@@ -76,13 +62,20 @@ export default function ReadingLevelPage({
           ← Ana Səhifəyə Qayıt
         </Link>
 
+        {/* İnkişaf Təqvimi (Sistem izləyir) */}
         <ProgressCalendar
           currentLevel={level}
           completedDays={completedDays}
-          onSelectDay={handleSelectDay}
+          activeDay={activeDay}
+          onSelectDay={(day) => setActiveDay(day)}
         />
 
-        <InteractiveLessonView lesson={sampleLesson} />
+        {/* Seçilmiş Günün Dərsi və Avtomatik Tamamlama Mexanizmi */}
+        <InteractiveLessonView
+          key={activeDay}
+          lesson={currentLesson}
+          onLessonComplete={handleLessonComplete}
+        />
       </div>
     </main>
   );

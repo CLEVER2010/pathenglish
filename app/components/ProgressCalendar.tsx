@@ -1,23 +1,24 @@
 "use client";
-import { useState } from "react";
 
 interface CalendarProps {
   currentLevel: string;
   completedDays: number[];
+  activeDay: number;
   onSelectDay: (day: number) => void;
 }
 
 export default function ProgressCalendar({
   currentLevel,
   completedDays,
+  activeDay,
   onSelectDay,
 }: CalendarProps) {
   const totalDays = 60;
   const progressPercent = Math.round((completedDays.length / totalDays) * 100);
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-xl">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-xl space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
             {currentLevel} Səviyyəsi • 2 Aylıq Təqvim
@@ -38,32 +39,34 @@ export default function ProgressCalendar({
         </div>
       </div>
 
-      {/* 60 Günlük Şəbəkə (Grid) */}
       <div className="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-12 gap-2">
         {Array.from({ length: totalDays }, (_, i) => i + 1).map((day) => {
           const isDone = completedDays.includes(day);
+          const isActive = activeDay === day;
+
           return (
             <button
               key={day}
               onClick={() => onSelectDay(day)}
-              className={`h-10 rounded-xl text-xs font-bold transition-all flex items-center justify-center ${
+              className={`h-10 rounded-xl text-xs font-bold transition-all flex items-center justify-center border ${
                 isDone
-                  ? "bg-green-500/20 border border-green-500/50 text-green-400 hover:bg-green-500/30"
-                  : "bg-white/5 border border-white/10 text-gray-400 hover:border-blue-500/50 hover:text-white"
+                  ? "bg-green-500/20 border-green-500/50 text-green-400 hover:bg-green-500/30"
+                  : isActive
+                  ? "bg-blue-600 border-blue-400 text-white shadow-lg shadow-blue-500/30"
+                  : "bg-white/5 border-white/10 text-gray-400 hover:border-blue-500/50 hover:text-white"
               }`}
             >
-              {isDone ? "✓" : `G-${day}`}
+              {isDone ? `✓ G-${day}` : `G-${day}`}
             </button>
           );
         })}
       </div>
 
-      {/* İmtahan Statusu */}
-      <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between">
+      <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-xs text-gray-400">
           {completedDays.length === totalDays
             ? "🎉 Təbriklər! Bütün dərsləri bitirdiniz. İmtahan açıldı!"
-            : "🔒 Yekun imtahanı açmaq üçün 60 günün hamısını tamamlayın."}
+            : `💡 Hazırda Gün ${activeDay} dərsindəsiniz. Testi bitirdikdə gün avtomatik yaşıl olacaq.`}
         </div>
         <a
           href={completedDays.length === totalDays ? `/exam/${currentLevel.toLowerCase()}` : "#"}
