@@ -1,225 +1,90 @@
-"use client";
-import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useState } from "react";
+'use client';
 
-export default function LevelHubPage() {
-  const params = useParams();
-  const level = (params?.level as string)?.toUpperCase() || "A1";
+import React, { useState } from 'react';
 
-  // Səviyyə kilidi yoxlaması (Simulyasiya: Məsələn yalnız A1 açıqdır, digərləri üçün imtahan tələb olunur)
-  const isLocked = level !== "A1" && level !== "B1"; // İstəyə görə tənzimləyə bilərsən
+const correctAnswers: { [key: string]: string } = {
+    q1: "C", q2: "C", q3: "B", q4: "D", q5: "B",
+    q6: "B", q7: "B", q8: "A", q9: "C", q10: "D",
+    q11: "C", q12: "C", q13: "C", q14: "A", q15: "D",
+    q16: "C", q17: "B", q18: "B", q19: "B", q20: "B"
+};
 
-  // Səviyyələrə görə TAMAMİLƏ FƏRQLİ MƏTNLƏR, Collocations və Definitions
-  const levelData: { [key: string]: any } = {
-    A1: {
-      title: "A1: My Daily Routine and Family",
-      time: "3 dəqiqə oxuma",
-      text: "I get up at 7 o'clock every morning. I wash my face and eat a healthy breakfast with my family. I like drinking tea and eating bread. Then, I go to school by bus. My school is big and clean. After school, I play football with my friends in the park.",
-      vocabulary: [
-        { word: "Routine", definition: "Hər gün təkrar olunan adəti işlər.", collocation: "daily routine (günlük vərdiş)" },
-        { word: "Healthy", definition: "Sağlam, faydalı.", collocation: "healthy food (sağlam qida)" }
-      ],
-      questions: [
-        { q: "What time does the person get up?", options: ["6 o'clock", "7 o'clock", "8 o'clock"], correct: 1 },
-        { q: "How does he go to school?", options: ["By bus", "By car", "Walking"], correct: 0 }
-      ]
-    },
-    B2: {
-      title: "B2: Socio-Economic Impacts of Digital Transformation",
-      time: "8 dəqiqə oxuma",
-      text: "The rapid paradigm shift toward automated infrastructures has fundamentally altered labor markets globally. Stakeholders must meticulously analyze consequential data trends to mitigate potential economic friction. Furthermore, cultivating synergistic partnerships between public and private sectors is paramount for sustainable long-term growth.",
-      vocabulary: [
-        { word: "Paradigm Shift", definition: "A fundamental change in approach or underlying assumptions.", collocation: "massive paradigm shift (köklü dəyişiklik)" },
-        { word: "Meticulously", definition: "Showing great attention to detail; very careful and precise.", collocation: "meticulously examine (diqqətlə araşdırmaq)" },
-        { word: "Synergistic", definition: "Working together cooperatively to achieve an enhanced outcome.", collocation: "synergistic partnership (qarşılıqlı faydalı tərəfdaşlıq)" }
-      ],
-      questions: [
-        { q: "What has fundamentally altered labor markets according to the text?", options: ["Automated infrastructures", "Traditional agriculture", "Local transport"], correct: 0 },
-        { q: "What is deemed paramount for sustainable long-term growth?", options: ["Reducing staff", "Synergistic partnerships", "Ignoring data trends"], correct: 1 }
-      ]
-    },
-    C1: {
-      title: "C1: Cognitive Metaphors in Advanced Discourse",
-      time: "10 dəqiqə oxuma",
-      text: "Advanced linguistic frameworks posit that human conceptual systems are inherently metaphorical. Deciphering nuanced ideological undercurrents requires an uncompromising commitment to critical hermeneutics. Scholars continually scrutinize how rhetorical strategies manipulate collective consciousness.",
-      vocabulary: [
-        { word: "Hermeneutics", definition: "The branch of knowledge that deals with interpretation, especially of texts.", collocation: "critical hermeneutics (tənqidi izah etmə)" },
-        { word: "Undercurrent", definition: "An underlying feeling or influence, especially one that is contrary to the prevailing atmosphere.", collocation: "ideological undercurrent (ideoloji axın)" }
-      ],
-      questions: [
-        { q: "What do advanced linguistic frameworks posit?", options: ["Language is purely literal", "Human conceptual systems are metaphorical", "Grammar has no rules"], correct: 1 }
-      ]
-    }
-  };
+export default function ReadingTestPage() {
+    const [score, setScore] = useState<number | null>(null);
 
-  const currentLevelInfo = levelData[level] || levelData["A1"];
-  const [activeDay, setActiveDay] = useState<number>(1);
-  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
-  const [score, setScore] = useState<number | null>(null);
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        let currentScore = 0;
+        let total = Object.keys(correctAnswers).length;
 
-  // 60 günlük proqram cədvəli generatoru (Hər gün üçün faiz)
-  const daysArray = Array.from({ length: 60 }, (_, i) => {
-    const dayNum = i + 1;
-    // Məsələn, keçilmiş günlər 100%, cari gün aktiv, qalanlar 0%
-    let progress = dayNum < activeDay ? 100 : dayNum === activeDay ? 40 : 0;
-    return { day: dayNum, progress };
-  });
+        for (let key in correctAnswers) {
+            if (formData.get(key) === correctAnswers[key]) {
+                currentScore++;
+            }
+        }
+        setScore(currentScore);
+    };
 
-  if (isLocked) {
     return (
-      <main className="min-h-screen bg-[#0b0f19] text-slate-100 font-sans flex items-center justify-center p-6">
-        <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl max-w-md text-center space-y-4 shadow-2xl">
-          <div className="w-16 h-16 bg-red-500/10 text-red-400 rounded-2xl flex items-center justify-center mx-auto text-2xl font-bold border border-red-500/20">🔒</div>
-          <h2 className="text-xl font-black text-white">Səviyyə Kilidlidir ({level})</h2>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Sistemi qorumaq üçün istədiyiniz səviyyəyə birbaşa keçə bilməzsiniz. Əvvəlki səviyyənin 60 günlük proqramını bitirib Yekun İmtahandan keçməlisiniz.
-          </p>
-          <Link href="/reading/a1" className="block w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition">
-            AÇIQ OLAN A1 SƏVİYYƏSİNƏ QAYIT →
-          </Link>
+        <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#f4f4f9', color: '#333', maxWidth: '850px', margin: '40px auto', padding: '20px', borderRadius: '8px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+            <h1 style={{ color: '#2c3e50' }}>PART 2: READING TEST (SARAH’S LIFE IN CANADA)</h1>
+
+            <div style={{ background: '#fff', padding: '20px', marginBottom: '30px', borderRadius: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', lineHeight: '1.6' }}>
+                <h2 style={{ color: '#2c3e50' }}>Sarah’s Life in Canada</h2>
+                <p>Sarah is 36 years old, and she lives in Canada. She has two young daughters. She works two days a week as a teacher. Her husband’s name is Nathan, and he’s a sales manager. Nathan’s job is very busy, so he often comes home late. At weekends, they often go driving or walking in the countryside. Nathan was born in Canada, but Sarah wasn’t. She was born in Argentina, and she moved to Canada when she was 26. When she was growing up, she was really interested in English. At first, she thought it was difficult, but when she finished school, she could already speak quite fluently and understand almost everything she heard or read. She spent a lot of time listening to songs and watching TV shows and films in English.</p>
+                <p>After she graduated from university, she decided to train as an English teacher. The certificate she needed was quite expensive, and competition for places was intense, but she was determined to do it—she simply couldn’t imagine doing anything else. She finished the course with a distinction, which was the highest grade possible. Soon, she found work as a teaching assistant in a local primary school. She enjoyed the work, although it was often challenging—the children were not always well-disciplined, and she didn’t think that the classroom teacher had enough understanding of teaching methods.</p>
+                <p>When she first went to Canada, she never would have imagined that she would end up staying there. It was supposed to be a short-term placement in a high school. She thought that she would be able to see a different part of the world and gain some useful experience, which could help her to find a better teaching position when she came back to Argentina. At first, she found living overseas much more difficult than she had expected. She felt homesick, and she had problems getting used to everything which was different in Canada—the interpersonal culture, the climate, the food… For the first three months she was there, she spent most of her free time in her room, dreaming of going back to Argentina and seeing her family again.</p>
+                <p>Over time, she adjusted to life in Canada, and even started to enjoy herself a bit more. One day, she met Nathan at a party. She liked his sense of humour, and how kind he was, but she was reluctant to get involved, knowing that she was planning to leave in the near future. When her placement finished, he convinced her to apply for a permanent job in another school. She told herself that she would give it one more year and see how things went.</p>
+                <p>Now, Sarah is settled, although she still misses Argentina. She tries to make it back at least yearly, and she is bringing up her daughters to be bilingual, so that they can talk to their Argentinian relatives in Spanish. When she thinks back to her first few months in Canada, she can scarcely recognise herself. In some ways, she wishes she weren’t so far away from her family, but at the same time, she feels that she’s learned many things which she never would have experienced had she stayed in Argentina. She wants to give her daughters the chance to travel and experience life in other countries as soon as she can, although of course she hopes they don’t move too far away!</p>
+            </div>
+
+            <form onSubmit={handleSubmit}>
+                {[
+                    { id: "q1", title: "1. During her first few months in Canada, Sarah ________.", options: [["A", "had to work very hard"], ["B", "met Nathan"], ["C", "didn't socialise much"], ["D", "made lots of new friends"]] },
+                    { id: "q2", title: "2. At weekends, Sarah and Nathan often ________.", options: [["A", "go to a village"], ["B", "work long hours"], ["C", "get out of the city"], ["D", "stay in the city"]] },
+                    { id: "q3", title: "3. When Sarah was at school, she ________ learning English.", options: [["A", "hated"], ["B", "liked"], ["C", "didn't like"], ["D", "didn't mind"]] },
+                    { id: "q4", title: "4. It took Sarah ________ to get used to living in Canada.", options: [["A", "about one month"], ["B", "several years"], ["C", "a few weeks"], ["D", "several months"]] },
+                    { id: "q5", title: "5. The children in Sarah’s first job ________.", options: [["A", "were often rude to her"], ["B", "didn't always behave well in class"], ["C", "didn't learn anything"], ["D", "didn't understand what she was saying"]] },
+                    { id: "q6", title: "6. When she left school, her English was ________.", options: [["A", "very bad"], ["B", "very good"], ["C", "perfect"], ["D", "not very good"]] },
+                    { id: "q7", title: "7. Nathan and Sarah ________.", options: [["A", "were born in the same year"], ["B", "were born in different countries"], ["C", "were born in different years"], ["D", "were born in the same country"]] },
+                    { id: "q8", title: "8. The children in Sarah’s first job ________.", options: [["A", "didn't always behave well in class"], ["B", "didn't understand what she was saying"], ["C", "didn't learn anything"], ["D", "were often rude to her"]] },
+                    { id: "q9", title: "9. Sarah has lived in Canada ________.", options: [["A", "since she was 36"], ["B", "for one year"], ["C", "for ten years"], ["D", "since she was born"]] },
+                    { id: "q10", title: "10. Because of Nathan, Sarah initially decided to stay in Canada ________.", options: [["A", "for a few more months"], ["B", "forever"], ["C", "until Nathan asked her to marry him"], ["D", "for another year"]] },
+                    { id: "q11", title: "11. Which sentence best describes Sarah’s attitude now towards her decision to stay in Canada?", options: [["A", "She wishes she had come to Canada earlier..."], ["B", "She isn't sure..."], ["C", "She wouldn't change her decision, although she still finds it hard to be so far from her family."], ["D", "She regrets her decision..."]] },
+                    { id: "q12", title: "12. Sarah thinks that she has ________ since coming to Canada.", options: [["A", "not changed very much"], ["B", "learned to speak English better"], ["C", "changed a lot"], ["D", "lost touch with her own country"]] },
+                    { id: "q13", title: "13. It took Sarah ________ to get used to living in Canada.", options: [["A", "about one month"], ["B", "several years"], ["C", "several months"], ["D", "a few weeks"]] },
+                    { id: "q14", title: "14. In her first job, she ________.", options: [["A", "worked with another teacher to teach young children"], ["B", "taught older children by herself"], ["C", "worked with another teacher to teach older children"], ["D", "taught young children by herself"]] },
+                    { id: "q15", title: "15. At weekends, Sarah and Nathan often ________.", options: [["A", "stay in the city"], ["B", "work long hours"], ["C", "go to a village"], ["D", "get out of the city"]] },
+                    { id: "q16", title: "16. During her first few months in Canada, Sarah ________.", options: [["A", "didn't socialise much"], ["B", "made lots of new friends"], ["C", "had to work very hard"], ["D", "met Nathan"]] },
+                    { id: "q17", title: "17. Sarah and Nathan have ________.", options: [["A", "two boys"], ["B", "two girls"], ["C", "one boy and one girl"], ["D", "no children"]] },
+                    { id: "q18", title: "18. Nathan and Sarah ________.", options: [["A", "were born in different years"], ["B", "were born in different countries"], ["C", "were born in the same year"], ["D", "were born in the same country"]] },
+                    { id: "q19", title: "19. Sarah thought that living in Canada ________.", options: [["A", "would be very different to living in Argentina"], ["B", "would be more difficult than it was"], ["C", "would make her feel homesick"], ["D", "would be easier than it was"]] },
+                    { id: "q20", title: "20. Nathan is ________.", options: [["A", "Sarah's father"], ["B", "Sarah's husband"], ["C", "Sarah's boyfriend"], ["D", "Sarah's manager"]] }
+                ].map((q) => (
+                    <div key={q.id} style={{ background: '#fff', padding: '20px', marginBottom: '20px', borderRadius: '6px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+                        <div style={{ fontWeight: 'bold', marginBottom: '15px' }}>{q.title}</div>
+                        <div>
+                            {q.options.map(([val, label]) => (
+                                <label key={val} style={{ display: 'block', marginBottom: '10px', cursor: 'pointer', padding: '8px', borderRadius: '4px' }}>
+                                    <input type="radio" name={q.id} value={val} required style={{ marginRight: '8px' }} />
+                                    {label}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+
+                <button type="submit" style={{ display: 'block', width: '100%', padding: '12px', backgroundColor: '#27ae60', color: 'white', border: 'none', fontSize: '16px', fontWeight: 'bold', borderRadius: '6px', cursor: 'pointer', marginTop: '30px' }}>
+                    Nəticəni Yoxla
+                </button>
+            </form>
+
+            {score !== null && (
+                <div style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold', marginTop: '20px', color: '#2c3e50' }}>
+                    Sizin nəticəniz: {score} / 20
+                </div>
+            )}
         </div>
-      </main>
     );
-  }
-
-  return (
-    <main className="min-h-screen bg-[#0b0f19] text-slate-100 font-sans p-6 md:p-12">
-      <div className="max-w-7xl mx-auto space-y-8">
-        
-        {/* Top Header */}
-        <div className="flex flex-wrap justify-between items-center border-b border-slate-800 pb-6 gap-4">
-          <div className="flex items-center space-x-3">
-            <Link href="/" className="text-lg font-black tracking-wider text-white">ELITE<span className="text-emerald-500">ACADEMY</span></Link>
-            <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20 uppercase">
-              Aktiv Səviyyə: {level} (2 Aylıq Proqram)
-            </span>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((lvl) => (
-              <Link
-                key={lvl}
-                href={`/reading/${lvl.toLowerCase()}`}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition border ${
-                  level === lvl ? "bg-emerald-600 border-emerald-500 text-white" : "bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800"
-                }`}
-              >
-                {lvl} {lvl > level ? "🔒" : ""}
-              </Link>
-            ))}
-            <Link href="/" className="ml-4 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700">
-              ← Əsas Səhifə
-            </Link>
-          </div>
-        </div>
-
-        {/* 60 Günlük Proqram Cədvəli və İrəliləyiş Faizi */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">📅 2 Aylıq (60 Günlük) Kurikulum və Günlük İrəliləyiş</h3>
-            <span className="text-xs text-emerald-400 font-bold">Cari Gün: {activeDay} / 60</span>
-          </div>
-          
-          {/* Günlərin siyahısı (Scrollable Grid) */}
-          <div className="flex gap-2 overflow-x-auto pb-3 pt-2">
-            {daysArray.map((d) => (
-              <button
-                key={d.day}
-                onClick={() => setActiveDay(d.day)}
-                className={`min-w-[65px] p-3 rounded-2xl flex flex-col items-center justify-center transition border ${
-                  activeDay === d.day
-                    ? "bg-emerald-600 border-emerald-400 text-white shadow-lg shadow-emerald-900/40"
-                    : d.progress === 100
-                    ? "bg-slate-800 border-slate-700 text-emerald-400"
-                    : "bg-slate-950 border-slate-800 text-slate-500 hover:bg-slate-800"
-                }`}
-              >
-                <span className="text-[10px] uppercase font-bold">Gün</span>
-                <span className="text-sm font-black">{d.day}</span>
-                <span className="text-[9px] mt-1 font-semibold">{d.progress}%</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Main Content & Advanced Definitions/Collocations for B2/C1 */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Reading & Complex Quiz */}
-          <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-3xl p-8 space-y-6 shadow-xl">
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-                {currentLevelInfo.time} — Gün {activeDay} Tapşırığı
-              </span>
-            </div>
-
-            <h2 className="text-2xl font-extrabold text-white">{currentLevelInfo.title}</h2>
-
-            <p className="text-slate-300 text-base leading-relaxed text-justify bg-slate-950/50 p-6 rounded-2xl border border-slate-800/60">
-              {currentLevelInfo.text}
-            </p>
-
-            {/* Test Sualları */}
-            <div className="space-y-6 pt-4 border-t border-slate-800">
-              <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Kompleks Anlama Testi</h3>
-              {currentLevelInfo.questions.map((q: any, qIdx: number) => (
-                <div key={qIdx} className="bg-slate-950/60 p-5 rounded-2xl border border-slate-800 space-y-3">
-                  <p className="text-sm font-bold text-white">{qIdx + 1}. {q.q}</p>
-                  <div className="space-y-2">
-                    {q.options.map((opt: string, optIdx: number) => (
-                      <button
-                        key={optIdx}
-                        onClick={() => setSelectedAnswers({ ...selectedAnswers, [qIdx]: optIdx })}
-                        className={`w-full text-left px-4 py-2.5 rounded-xl text-xs font-medium transition border ${
-                          selectedAnswers[qIdx] === optIdx
-                            ? "bg-emerald-600 border-emerald-500 text-white font-bold"
-                            : "bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800"
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-
-              <button
-                onClick={() => setScore(2)}
-                className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white font-bold text-xs rounded-2xl transition shadow-lg"
-              >
-                Nəticəni Yoxla və İrəliləyişi Qeyd Et 🎯
-              </button>
-
-              {score !== null && (
-                <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-center">
-                  <p className="text-emerald-400 font-bold text-sm">
-                    Təbriklər! Gün {activeDay} uğurla tamamlandı (+40% irəliləyiş). 🎉
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right Column: Definitions & Collocations (B2/C1 üçün xüsusi gücləndirilmiş) */}
-          <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 space-y-6 shadow-xl h-fit">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-3">
-              📚 {level} - Sözlər, İzahlar & Collocations
-            </h3>
-            <div className="space-y-4">
-              {currentLevelInfo.vocabulary.map((vocab: any, vIdx: number) => (
-                <div key={vIdx} className="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 space-y-2">
-                  <span className="text-emerald-400 font-extrabold text-sm block">{vocab.word}</span>
-                  <p className="text-xs text-slate-300"><strong className="text-slate-400">İzah (Definition):</strong> {vocab.definition}</p>
-                  <p className="text-xs text-teal-300"><strong className="text-slate-400">Collocation:</strong> {vocab.collocation}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </main>
-  );
 }

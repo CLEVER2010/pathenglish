@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Listening Level Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .audio-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 15px;
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        audio {
+            width: 100%;
+            max-width: 500px;
+        }
+        .question-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .options label:hover {
+            background: #f1f1f1;
+        }
+        button#submit-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+        button#submit-btn:hover {
+            background-color: #219653;
+        }
+        #result {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>English Listening Level Test</h1>
+
+    <div class="audio-container">
+        <p><strong>Audio Faylı Dinləyin:</strong></p>
+        <audio controls>
+            <source src="/audio/listening-test-pt-2.mp3" type="audio/mpeg">
+            Sizin brauzer audio elementi dəstəkləmir.
+        </audio>
+    </div>
+
+    <form id="quiz-form">
+        <!-- 1 -->
+        <div class="question-card">
+            <div class="question-title">1. Where is the woman from?</div>
+            <div class="options">
+                <label><input type="radio" name="q1" value="A"> Croatia</label>
+                <label><input type="radio" name="q1" value="B"> Australia</label>
+                <label><input type="radio" name="q1" value="C"> Russia</label>
+                <label><input type="radio" name="q1" value="D"> Germany</label>
+            </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="question-card">
+            <div class="question-title">2. The woman says that you can travel from Croatia to Germany in two hours by ________.</div>
+            <div class="options">
+                <label><input type="radio" name="q2" value="A"> bus</label>
+                <label><input type="radio" name="q2" value="B"> car</label>
+                <label><input type="radio" name="q2" value="C"> plane</label>
+                <label><input type="radio" name="q2" value="D"> train</label>
+            </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="question-card">
+            <div class="question-title">3. What does the man think?</div>
+            <div class="options">
+                <label><input type="radio" name="q3" value="A"> Croatia is a part of Germany.</label>
+                <label><input type="radio" name="q3" value="B"> His geography is very good.</label>
+                <label><input type="radio" name="q3" value="C"> The woman is from Germany.</label>
+                <label><input type="radio" name="q3" value="D"> He doesn't know enough about geography.</label>
+            </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="question-card">
+            <div class="question-title">4. What does the woman think of the man's mistake?</div>
+            <div class="options">
+                <label><input type="radio" name="q4" value="A"> It's funny.</label>
+                <label><input type="radio" name="q4" value="B"> It's not serious.</label>
+                <label><input type="radio" name="q4" value="C"> It's very serious.</label>
+                <label><input type="radio" name="q4" value="D"> It's stupid.</label>
+            </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="question-card">
+            <div class="question-title">5. What are they looking at?</div>
+            <div class="options">
+                <label><input type="radio" name="q5" value="A"> an email</label>
+                <label><input type="radio" name="q5" value="B"> a picture or a photo</label>
+                <label><input type="radio" name="q5" value="C"> a story in a book</label>
+                <label><input type="radio" name="q5" value="D"> a newspaper</label>
+            </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="question-card">
+            <div class="question-title">6. Who is the person they’re looking at?</div>
+            <div class="options">
+                <label><input type="radio" name="q6" value="A"> the woman's father's older brother</label>
+                <label><input type="radio" name="q6" value="B"> the man's father's younger brother</label>
+                <label><input type="radio" name="q6" value="C"> the man's mother's older brother</label>
+                <label><input type="radio" name="q6" value="D"> the man's father's older brother</label>
+            </div>
+        </div>
+
+        <!-- 7 -->
+        <div class="question-card">
+            <div class="question-title">7. The woman thinks the man's uncle ________.</div>
+            <div class="options">
+                <label><input type="radio" name="q7" value="A"> looks kind</label>
+                <label><input type="radio" name="q7" value="B"> is handsome</label>
+                <label><input type="radio" name="q7" value="C"> is kind</label>
+                <label><input type="radio" name="q7" value="D"> looks unfriendly</label>
+            </div>
+        </div>
+
+        <!-- 8 -->
+        <div class="question-card">
+            <div class="question-title">8. Why doesn't the man see his uncle very much?</div>
+            <div class="options">
+                <label><input type="radio" name="q8" value="A"> His mum and his uncle don't have a good relationship.</label>
+                <label><input type="radio" name="q8" value="B"> His uncle and his dad don't have a good relationship.</label>
+                <label><input type="radio" name="q8" value="C"> His uncle's wife and his dad don't have a good relationship.</label>
+                <label><input type="radio" name="q8" value="D"> His uncle lives too far away.</label>
+            </div>
+        </div>
+
+        <!-- 9 -->
+        <div class="question-card">
+            <div class="question-title">9. Where is this conversation taking place?</div>
+            <div class="options">
+                <label><input type="radio" name="q9" value="A"> a bar</label>
+                <label><input type="radio" name="q9" value="B"> a restaurant</label>
+                <label><input type="radio" name="q9" value="C"> someone's house</label>
+                <label><input type="radio" name="q9" value="D"> a supermarket</label>
+            </div>
+        </div>
+
+        <!-- 10 -->
+        <div class="question-card">
+            <div class="question-title">10. What problem does the man mention?</div>
+            <div class="options">
+                <label><input type="radio" name="q10" value="A"> They don't sell salmon.</label>
+                <label><input type="radio" name="q10" value="B"> They only serve fish.</label>
+                <label><input type="radio" name="q10" value="C"> It's very busy today.</label>
+                <label><input type="radio" name="q10" value="D"> There isn't any more salmon.</label>
+            </div>
+        </div>
+
+        <!-- 11 -->
+        <div class="question-card">
+            <div class="question-title">11. When the man tells the woman that she can’t have salmon, she is ________.</div>
+            <div class="options">
+                <label><input type="radio" name="q11" value="A"> a bit sad</label>
+                <label><input type="radio" name="q11" value="B"> very angry</label>
+                <label><input type="radio" name="q11" value="C"> a little disappointed</label>
+                <label><input type="radio" name="q11" value="D"> quite irritated</label>
+            </div>
+        </div>
+
+        <!-- 12 -->
+        <div class="question-card">
+            <div class="question-title">12. What does the man do?</div>
+            <div class="options">
+                <label><input type="radio" name="q12" value="A"> He tells the woman he will choose a dish for her.</label>
+                <label><input type="radio" name="q12" value="B"> He suggests a similar dish.</label>
+                <label><input type="radio" name="q12" value="C"> He apologises many times.</label>
+                <label><input type="radio" name="q12" value="D"> He tries to sell the woman a more expensive dish.</label>
+            </div>
+        </div>
+
+        <!-- 13 -->
+        <div class="question-card">
+            <div class="question-title">13. The woman ________.</div>
+            <div class="options">
+                <label><input type="radio" name="q13" value="A"> is a bit late</label>
+                <label><input type="radio" name="q13" value="B"> is early</label>
+                <label><input type="radio" name="q13" value="C"> is on time</label>
+                <label><input type="radio" name="q13" value="D"> is very late</label>
+            </div>
+        </div>
+
+        <!-- 14 -->
+        <div class="question-card">
+            <div class="question-title">14. The woman ________.</div>
+            <div class="options">
+                <label><input type="radio" name="q14" value="A"> doesn't want to go anywhere</label>
+                <label><input type="radio" name="q14" value="B"> doesn't feel well</label>
+                <label><input type="radio" name="q14" value="C"> doesn't want to walk far</label>
+                <label><input type="radio" name="q14" value="D"> doesn't know where to go</label>
+            </div>
+        </div>
+
+        <!-- 15 -->
+        <div class="question-card">
+            <div class="question-title">15. Why is the man surprised?</div>
+            <div class="options">
+                <label><input type="radio" name="q15" value="A"> The woman is wearing such unsuitable shoes.</label>
+                <label><input type="radio" name="q15" value="B"> The woman is so late.</label>
+                <label><input type="radio" name="q15" value="C"> The woman doesn't know where the place is.</label>
+                <label><input type="radio" name="q15" value="D"> The woman has been to the place before.</label>
+            </div>
+        </div>
+
+        <!-- 16 -->
+        <div class="question-card">
+            <div class="question-title">16. Which is true about the woman?</div>
+            <div class="options">
+                <label><input type="radio" name="q16" value="A"> She would have gone to the place once before, if her friend had come with her.</label>
+                <label><input type="radio" name="q16" value="B"> She wishes her friend were with her now.</label>
+                <label><input type="radio" name="q16" value="C"> She went to the place last week.</label>
+                <label><input type="radio" name="q16" value="D"> She would have gone to the place once before, if her friend hadn't come with her.</label>
+            </div>
+        </div>
+
+        <button type="button" id="submit-btn" onclick="checkAnswers()">Nəticəni Yoxla</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        const correctAnswers = {
+            q1: "D",
+            q2: "B",
+            q3: "A",
+            q4: "D",
+            q5: "B",
+            q6: "C",
+            q7: "D",
+            q8: "C",
+            q9: "D",
+            q10: "D",
+            q11: "B",
+            q12: "A",
+            q13: "D",
+            q14: "A",
+            q15: "B",
+            q16: "D"
+        };
+
+        function checkAnswers() {
+            let score = 0;
+            let total = Object.keys(correctAnswers).length;
+
+            for (let key in correctAnswers) {
+                const selected = document.querySelector(`input[name="${key}"]:checked`);
+                if (selected && selected.value === correctAnswers[key]) {
+                    score++;
+                }
+            }
+
+            document.getElementById("result").innerText = `Sizin nəticəniz: ${score} / ${total}`;
+        }
+    </script>
+</body>
+</html>
