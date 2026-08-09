@@ -18,7 +18,7 @@ export default function ProgressCalendar({
   const progressPercent = Math.round((completedDays.length / totalDays) * 100);
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 md:p-8 shadow-xl space-y-6">
+    <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 md:p-8 shadow-2xl space-y-6">
       <div className="flex flex-col gap-2">
         <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
           {currentLevel} Səviyyəsi • 60 Günlük Sistem
@@ -51,11 +51,11 @@ export default function ProgressCalendar({
               onClick={() => !isLocked && onSelectDay(day)}
               className={`h-11 rounded-xl text-xs font-bold transition-all flex items-center justify-center border ${
                 isDone
-                  ? "bg-green-500/20 border-green-500 text-green-400"
+                  ? "bg-green-500/20 border-green-500 text-green-400 shadow-lg shadow-green-500/10"
                   : isLocked
-                  ? "bg-slate-950/60 border-white/5 text-gray-700 cursor-not-allowed"
+                  ? "bg-slate-950/40 border-white/5 text-gray-600 cursor-not-allowed opacity-50"
                   : isActive
-                  ? "bg-blue-600 border-blue-400 text-white shadow-lg shadow-blue-500/30"
+                  ? "bg-blue-600 border-blue-400 text-white shadow-lg shadow-blue-500/30 scale-105 z-10"
                   : "bg-white/5 border-white/10 text-gray-300 hover:border-blue-500"
               }`}
             >
@@ -65,11 +65,11 @@ export default function ProgressCalendar({
         })}
       </div>
 
-      <div className="text-xs text-gray-400 bg-white/5 p-4 rounded-2xl border border-white/5">
+      <div className="text-xs text-gray-400 bg-white/5 p-4 rounded-2xl border border-white/5 leading-relaxed">
         {completedDays.length === totalDays ? (
           <span className="text-green-400 font-bold">🎉 Təbriklər! Bütün günlər bitdi, imtahan açıldı!</span>
         ) : (
-          <span>💡 Sistem qaydası: Növbəti günə keçmək üçün cari günün dərsini oxuyub 10 suallıq testi tamamlamalısan.</span>
+          <span>💡 <strong className="text-white">Sistem Qaydası:</strong> Növbəti günə keçmək üçün cari günün dərslərini oxuyub 10 suallıq testi tamamlamalısan.</span>
         )}
       </div>
     </div>

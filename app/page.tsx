@@ -5,32 +5,34 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white p-6 md:p-16 font-sans flex flex-col justify-center items-center">
-      <div className="max-w-6xl w-full mx-auto space-y-16 text-center">
+      <div className="max-w-7xl w-full mx-auto space-y-16 text-center">
         
-        {/* Motivasiya və Başlıq */}
+        {/* Başlıq və Seçdiyimiz Motivasiya Bloku */}
         <div className="space-y-6 max-w-4xl mx-auto">
-          <span className="px-5 py-2 rounded-full bg-blue-500/20 text-blue-400 text-xs font-extrabold uppercase tracking-widest border border-blue-500/30">
+          <span className="px-5 py-2 rounded-full bg-blue-500/20 text-blue-400 text-xs font-extrabold uppercase tracking-widest border border-blue-500/30 shadow-lg shadow-blue-500/10">
             PathEnglish.az • İnteraktiv Təhsil Platforması
           </span>
           <h1 className="text-4xl md:text-7xl font-black tracking-tight bg-gradient-to-r from-white via-gray-200 to-blue-400 bg-clip-text text-transparent">
             İngilis Dilini 60 Günə Mənimsəyin
           </h1>
           <p className="text-gray-300 text-base md:text-xl leading-relaxed">
-            Azərbaycanlı şagirdlərin problemi ingilis dilini öyrənə bilməmək deyil. 
-            Onların əsas problemi ingilis dilini öyrənməyin <span className="text-blue-400 font-bold">doğru yolunu</span> bilməməkdir. 
-            Biz bu sistemi sənin üçün hər səviyyəyə uyğun olaraq qurmuşuq.
+            Dil öyrənə bilməməyin səbəbi istedadsızlıq deyil – <span className="text-blue-400 font-bold">istiqamətsizlikdir</span>. 
+            Yanlış üsullarla vaxt itirməyi dayandır; səni A1-dən C2-yə aparacaq tək doğru sistem buradadır.
           </p>
         </div>
 
-        {/* Modullar */}
+        {/* Modullar Grid Sistemi */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-          {/* Reading */}
-          <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 space-y-5 shadow-2xl hover:border-blue-500/50 transition">
-            <div className="text-3xl">📖</div>
-            <h2 className="text-2xl font-bold">Reading (Oxuma)</h2>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              60 günlük sistemli təqvim, seçilmiş mətnlər, çətin sözlər, collocations və 10 suallıq testlər.
-            </p>
+          
+          {/* Reading Modulu */}
+          <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 space-y-6 shadow-2xl hover:border-blue-500/50 transition-all duration-300">
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-2xl border border-blue-500/20">📖</div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold">Reading (Oxuma)</h2>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                60 günlük sistemli təqvim, seçilmiş mətnlər, çətin sözlər, collocations və 10 suallıq testlər.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-2 pt-2">
               {levels.map((lvl) => (
                 <Link
@@ -44,13 +46,15 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Listening */}
-          <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 space-y-5 shadow-2xl hover:border-purple-500/50 transition">
-            <div className="text-3xl">🎧</div>
-            <h2 className="text-2xl font-bold">Listening (Dinləmə)</h2>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              Günlərə görə dəyişən mövzular (Education, Sports və s.), real audio materiallar və 10 suallıq testlər.
-            </p>
+          {/* Listening Modulu */}
+          <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 space-y-6 shadow-2xl hover:border-purple-500/50 transition-all duration-300">
+            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl border border-purple-500/20">🎧</div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold">Listening (Dinləmə)</h2>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Hər günə uyğun fərqli mövzular (Education, Technology və s.), real audio materiallar və 10 suallıq testlər.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-2 pt-2">
               {levels.map((lvl) => (
                 <Link
@@ -64,13 +68,15 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Exam */}
-          <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 space-y-5 shadow-2xl hover:border-green-500/50 transition">
-            <div className="text-3xl">🎓</div>
-            <h2 className="text-2xl font-bold">Yekun İmtahan</h2>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              60 günü tam bitirdikdən sonra kilidi açılan və səviyyəni yoxlayan peşəkar imtahan.
-            </p>
+          {/* Yekun İmtahan Modulu */}
+          <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 space-y-6 shadow-2xl hover:border-green-500/50 transition-all duration-300">
+            <div className="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center text-2xl border border-green-500/20">🎓</div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold">Yekun İmtahan</h2>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                60 günü tam bitirdikdən sonra kilidi açılan və səviyyəni rəsmi olaraq təsdiqləyən imtahan.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-2 pt-2">
               {levels.map((lvl) => (
                 <Link
@@ -83,6 +89,7 @@ export default function Home() {
               ))}
             </div>
           </div>
+
         </div>
 
       </div>
