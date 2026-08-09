@@ -25,126 +25,157 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
     }
   }, [level]);
 
-  // Cathoven, BBC Learning English & TED-ED üslubunda genişləndirilmiş akademik mətn generatoru
-  const getDayContent = (day: number) => {
-    return {
-      title: `Day ${day}: Advanced Insights & Global Perspectives (${level})`,
-      text: `Modern educational paradigms and cognitive research consistently emphasize that mastering a language at the ${level} level requires deep immersion into authentic contexts. Drawing parallels from TED-Ed insights and BBC Learning English frameworks, language acquisition is not merely a mechanical repetition of vocabulary, but an active restructuring of critical thinking pathways. When learners engage with complex discourse, sophisticated syntax, and multi-layered arguments, their cognitive flexibility expands exponentially. Furthermore, recent studies in applied linguistics highlight that sustained exposure to diverse informational textures—ranging from socio-economic essays to technological breakthroughs—bridges the gap between intermediate fluency and near-native articulation. As you navigate through today's comprehensive analysis, focus on identifying structural cohesion, transitional markers, and nuanced authorial tones that elevate comprehension beyond superficial interpretation.`,
-      vocabulary: [
-        { term: "Paradigm", def: "A typical example or pattern of something (model/framework)." },
-        { term: "Cognitive flexibility", def: "The mental ability to switch between thinking about two different concepts." },
-        { term: "Cohesion", def: "The action or fact of forming a united whole in text or speech." }
-      ],
-      questions: [
-        {
-          id: 1,
-          question: "According to modern educational paradigms and cognitive research, what is primarily required to master a language at the advanced level?",
-          options: [
-            "A) Deep immersion into authentic contexts and complex discourse",
-            "B) Pure mechanical repetition of isolated vocabulary lists",
-            "C) Surface-level interpretation without structural analysis"
+  // Hər səviyyəyə (A1-C2) və günə uyğun xüsusi, fərqli mətnlər
+  const getDayContent = (lvl: string, day: number) => {
+    switch (lvl) {
+      case "A1":
+        return {
+          title: `Day ${day}: My Daily Routine & Family`,
+          text: `Hello! My name is Alex. Every day, I wake up at 7 o'clock in the morning. I wash my face, brush my teeth, and eat a healthy breakfast with my family. I usually eat eggs and drink orange juice. After breakfast, I walk to school because my school is near my house. My favorite subject is English, and I like reading short stories. In the afternoon, I play football with my friends in the park. In the evening, I do my homework and help my mother cook dinner. We go to sleep at 10 PM.`,
+          vocabulary: [
+            { term: "Routine", def: "A sequence of actions regularly followed." },
+            { term: "Healthy", def: "Good for your health and body." },
+            { term: "Subject", def: "A branch of knowledge studied at school." }
           ],
-          correct: 0
-        },
-        {
-          id: 2,
-          question: "How does language acquisition compare to simple mechanical repetition according to the passage?",
-          options: [
-            "A) It is equivalent to memorizing basic grammar drills",
-            "B) It represents an active restructuring of critical thinking pathways",
-            "C) It relies exclusively on short-term audio repetition"
+          questions: [
+            { id: 1, question: "What time does Alex wake up in the morning?", options: ["A) 6 o'clock", "B) 7 o'clock", "C) 8 o'clock"], correct: 1 },
+            { id: 2, question: "What does Alex usually drink for breakfast?", options: ["A) Milk", "B) Coffee", "C) Orange juice"], correct: 2 },
+            { id: 3, question: "How does Alex go to school?", options: ["A) By bus", "B) By car", "C) On foot (walks)"], correct: 2 },
+            { id: 4, question: "What is Alex's favorite subject?", options: ["A) Math", "B) English", "C) Science"], correct: 1 },
+            { id: 5, question: "What does Alex do in the afternoon?", options: ["A) Plays football in the park", "B) Watches TV at home", "C) Swims in the pool"], correct: 0 },
+            { id: 6, question: "Who does Alex help in the evening?", options: ["A) His father", "B) His mother", "C) His teacher"], correct: 1 },
+            { id: 7, question: "What time does Alex go to sleep?", options: ["A) 9 PM", "B) 10 PM", "C) 11 PM"], correct: 1 },
+            { id: 8, question: "What does 'Routine' mean?", options: ["A) A new game", "B) Regular actions followed", "C) A type of food"], correct: 1 },
+            { id: 9, question: "Where does Alex play football?", options: ["A) At school", "B) In the park", "C) On the street"], correct: 1 },
+            { id: 10, question: "What does Alex eat for breakfast?", options: ["A) Eggs and orange juice", "B) Pizza and cola", "C) Soup and bread"], correct: 0 }
+          ]
+        };
+      case "A2":
+        return {
+          title: `Day ${day}: Planning a Weekend Trip`,
+          text: `Last week, Sarah and her friends decided to plan a weekend trip to the mountains. They wanted to escape the noisy city life and spend two days in nature. Sarah checked the weather forecast, and it showed sunny weather for Saturday and Sunday. They packed their backpacks with warm clothes, comfortable hiking boots, delicious snacks, and a large tent. On Saturday morning, they took an early train to the countryside. When they arrived, they set up their camp near a clear, blue lake. In the afternoon, they explored a forest trail and took many wonderful photographs of wild animals and colorful flowers. At night, they sat around a warm campfire, told funny stories, and looked at the bright stars in the sky. It was an unforgettable experience for all of them.`,
+          vocabulary: [
+            { term: "Escape", def: "Break free from confinement or control." },
+            { term: "Explore", def: "Travel through an unfamiliar area in order to learn about it." },
+            { term: "Unforgettable", def: "Impossible to forget; very memorable." }
           ],
-          correct: 1
-        },
-        {
-          id: 3,
-          question: "What happens when learners engage with complex discourse and sophisticated syntax?",
-          options: [
-            "A) Their cognitive flexibility expands exponentially",
-            "B) Their reading speed decreases permanently",
-            "C) Their comprehension levels become superficial"
+          questions: [
+            { id: 1, question: "Where did Sarah and her friends plan to go?", options: ["A) To the beach", "B) To the mountains", "C) To a big city"], correct: 1 },
+            { id: 2, question: "What was the weather forecast for the weekend?", options: ["A) Rainy and cold", "B) Snowy and windy", "C) Sunny"], correct: 2 },
+            { id: 3, question: "How did they travel to the countryside?", options: ["A) By train", "B) By bus", "C) By car"], correct: 0 },
+            { id: 4, question: "Where did they set up their camp?", options: ["A) Near a city mall", "B) Near a blue lake", "C) Inside a deep cave"], correct: 1 },
+            { id: 5, question: "What did they do in the afternoon?", options: ["A) Explored a forest trail", "B) Went swimming in the river", "C) Slept in the tent all day"], correct: 0 },
+            { id: 6, question: "What did they do at night?", options: ["A) Watched a movie", "B) Sat around a campfire", "C) Went fishing"], correct: 1 },
+            { id: 7, question: "What did they pack in their backpacks?", options: ["A) Laptops and books", "B) Warm clothes, boots, snacks, and a tent", "C) Swimming suits and towels"], correct: 1 },
+            { id: 8, question: "What does 'Escape' mean?", options: ["A) To run away or break free", "B) To build a house", "C) To buy tickets"], correct: 0 },
+            { id: 9, question: "What does 'Explore' mean?", options: ["A) To destroy something", "B) To travel and learn about an area", "C) To cook food"], correct: 1 },
+            { id: 10, question: "How did they feel about the trip?", options: ["A) It was boring", "B) It was unforgettable", "C) It was terrible"], correct: 1 }
+          ]
+        };
+      case "B1":
+        return {
+          title: `Day ${day}: The Impact of Technology on Daily Communication`,
+          text: `In the twenty-first century, digital technology has fundamentally transformed how human beings interact, work, and maintain social relationships. Smartphones, social networking platforms, and instant messaging apps allow individuals to bridge geographical distances within seconds. While previous generations relied heavily on physical letters and landline telephones, modern society benefits from seamless, real-time global connectivity. However, psychologists often debate whether this hyper-connectivity enhances or diminishes genuine human bonding. On one hand, video calls enable families separated across continents to stay closely connected. On the other hand, excessive screen time can lead to reduced face-to-face social skills and feelings of isolation. Striking a healthy balance between digital engagement and real-world interactions remains one of the major challenges of our modern era.`,
+          vocabulary: [
+            { term: "Fundamentally", def: "In central or primary respects; essentially." },
+            { term: "Geographical", def: "Based on or relating to geography or distance." },
+            { term: "Diminish", def: "Make or become less." }
           ],
-          correct: 0
-        },
-        {
-          id: 4,
-          question: "What do recent studies in applied linguistics highlight regarding informational textures?",
-          options: [
-            "A) They should be avoided by intermediate learners",
-            "B) They bridge the gap between intermediate fluency and near-native articulation",
-            "C) They complicate learning without providing real benefits"
+          questions: [
+            { id: 1, question: "What has digital technology fundamentally transformed in the 21st century?", options: ["A) Agricultural methods", "B) Human communication and relationships", "C) Global weather patterns"], correct: 1 },
+            { id: 2, question: "How did previous generations communicate across distances?", options: ["A) Via instant video messaging", "B) Using physical letters and landlines", "C) Through satellite communication"], correct: 1 },
+            { id: 3, question: "What is one major advantage of modern connectivity?", options: ["A) Eliminating the need to speak languages", "B) Real-time global connectivity across distances", "C) Completely stopping all conflicts"], correct: 1 },
+            { id: 4, question: "What do psychologists debate regarding hyper-connectivity?", options: ["A) Its cost effectiveness", "B) Whether it enhances or diminishes human bonding", "C) Its impact on computer hardware"], correct: 1 },
+            { id: 5, question: "What is a positive outcome of video calls mentioned in the text?", options: ["A) Helping families separated across continents stay connected", "B) Reducing electricity consumption", "C) Improving physical fitness"], correct: 0 },
+            { id: 6, question: "What can excessive screen time potentially lead to?", options: ["A) Better mathematical skills", "B) Reduced face-to-face social skills and isolation", "C) Higher reading speeds"], correct: 1 },
+            { id: 7, question: "What is described as a major challenge of our modern era?", options: ["A) Finding faster internet providers", "B) Striking a balance between digital and real-world interactions", "C) Eliminating smartphones completely"], correct: 1 },
+            { id: 8, question: "What does 'Fundamentally' mean?", options: ["A) Superficially", "B) Essentially / in central respects", "C) Temporarily"], correct: 1 },
+            { id: 9, question: "What does 'Diminish' mean?", options: ["A) To increase or grow", "B) To make or become less", "C) To remain stable"], correct: 1 },
+            { id: 10, question: "What is the overall tone of the passage regarding technology?", options: ["A) Completely negative and pessimistic", "B) Balanced, examining both pros and cons", "C) Purely promotional for phone companies"], correct: 1 }
+          ]
+        };
+      case "B2":
+        return {
+          title: `Day ${day}: Environmental Sustainability and Renewable Energy Transitions`,
+          text: `The global transition from fossil fuels to renewable energy sources has emerged as one of the most critical socio-economic imperatives of our time. As industrial carbon emissions continue to exacerbate climate change, governments and corporations are heavily investing in solar, wind, and hydroelectric power infrastructures. Nevertheless, moving away from conventional energy grids presents complex engineering and financial challenges. Energy storage limitations, grid modernization requirements, and high initial capital investments often slow down the implementation process. Despite these obstacles, technological advancements in battery efficiency and photovoltaic cells are steadily improving economic viability. Furthermore, public awareness campaigns encourage citizens to adopt sustainable habits, demonstrating that collective grassroots efforts combined with institutional policy changes can yield substantial long-term ecological benefits.`,
+          vocabulary: [
+            { term: "Imperative", def: "Of vital importance; crucial." },
+            { term: "Exacerabate", def: "Make a problem or bad situation worse." },
+            { term: "Viability", def: "The ability to work successfully or survive sustainably." }
           ],
-          correct: 1
-        },
-        {
-          id: 5,
-          question: "Which of the following ranges of informational textures are mentioned in the text?",
-          options: [
-            "A) Fictional novels and poetry only",
-            "B) Socio-economic essays to technological breakthroughs",
-            "C) Historical archives and ancient manuscripts"
+          questions: [
+            { id: 1, question: "What has emerged as a critical global socio-economic imperative?", options: ["A) Space colonization", "B) Transitioning from fossil fuels to renewables", "C) Expanding traditional oil pipelines"], correct: 1 },
+            { id: 2, question: "What do industrial carbon emissions contribute to?", options: ["A) Economic stability", "B) Exacerbating climate change", "C) Improving agricultural yields"], correct: 1 },
+            { id: 3, question: "Why is moving away from conventional energy grids difficult?", options: ["A) Due to engineering, storage, and financial challenges", "B) Because renewable energy does not exist", "C) Because public demand is zero"], correct: 0 },
+            { id: 4, question: "What technological advancements are improving economic viability?", options: ["A) Paper manufacturing and printing", "B) Battery efficiency and photovoltaic cells", "C) Mechanical clockwork mechanisms"], correct: 1 },
+            { id: 5, question: "What role do public awareness campaigns play?", options: ["A) They encourage citizens to adopt sustainable habits", "B) They promote higher fossil fuel consumption", "C) They discourage scientific research"], correct: 0 },
+            { id: 6, question: "What does combination of grassroots efforts and policy changes yield?", options: ["A) Short-term financial loss", "B) Substantial long-term ecological benefits", "C) Increased carbon emissions"], correct: 1 },
+            { id: 7, question: "What does 'Imperative' mean?", options: ["A) Unimportant or trivial", "B) Of vital importance; crucial", "C) Temporary and optional"], correct: 1 },
+            { id: 8, question: "What does 'Viability' refer to in this context?", options: ["A) The ability to work successfully and sustainably", "B) The physical weight of solar panels", "C) The speed of wind turbines"], correct: 0 },
+            { id: 9, question: "What hinders the rapid implementation of renewable systems?", options: ["A) High initial capital investments and storage limits", "B) Excessively sunny weather", "C) Lack of interest from engineers"], correct: 0 },
+            { id: 10, question: "What is the primary message of the text?", options: ["A) Renewable transition is challenging yet vital and progressing", "B) Fossil fuels are the only viable future", "C) Environmental policies are completely useless"], correct: 0 }
+          ]
+        };
+      case "C1":
+        return {
+          title: `Day ${day}: Cognitive Biases in Decision-Making and Economic Behavior`,
+          text: `Behavioral economics and cognitive psychology have profoundly reshaped our understanding of human rationality, challenging the classical economic assumption that individuals always act as perfectly rational maximizers. Research pioneered by notable cognitive scientists reveals that human decision-making is systematically influenced by heuristic mental shortcuts and cognitive biases. Confirmation bias, anchoring effects, and loss aversion frequently skew objective risk assessment in financial markets, corporate boardrooms, and everyday choices. For instance, confirmation bias leads individuals to selectively process information that aligns with pre-existing beliefs while discounting contradictory evidence. Recognizing these mental blind spots is essential not only for improving individual judgment but also for designing robust institutional safeguards that mitigate systemic economic volatility and irrational market exuberance.`,
+          vocabulary: [
+            { term: "Heuristic", def: "Enabling a person to discover or learn something for themselves (mental shortcut)." },
+            { term: "Aversion", def: "A strong dislike or opposing inclination (e.g., loss aversion)." },
+            { term: "Exuberance", def: "The quality of being full of energy, excitement, or over-optimism." }
           ],
-          correct: 1
-        },
-        {
-          id: 6,
-          question: "What specific elements should the learner focus on while navigating the analysis?",
-          options: [
-            "A) Structural cohesion, transitional markers, and nuanced authorial tones",
-            "B) Memorizing every single word by heart",
-            "C) Translating text word-for-word into native language"
+          questions: [
+            { id: 1, question: "What classical economic assumption has behavioral research challenged?", options: ["A) That humans are always perfectly rational maximizers", "B) That markets never fluctuate in value", "C) That money is the only motivator"], correct: 0 },
+            { id: 2, question: "What systematically influences human decision-making according to scientists?", options: ["A) Random coin tosses", "B) Heuristic mental shortcuts and cognitive biases", "C) Strict mathematical algorithms only"], correct: 1 },
+            { id: 3, question: "How does confirmation bias affect information processing?", options: ["A) It makes people process all data equally", "B) It leads individuals to favor data matching pre-existing beliefs", "C) It completely eliminates memory retention"], correct: 1 },
+            { id: 4, question: "Where do anchoring effects and loss aversion skew objective risk assessment?", options: ["A) Only in laboratory card games", "B) In financial markets, boardrooms, and everyday choices", "C) Exclusively in ancient history"], correct: 1 },
+            { id: 5, question: "Why is recognizing cognitive blind spots important?", options: ["A) To improve judgment and design institutional safeguards", "B) To increase market exuberance", "C) To eliminate all economic activity"], correct: 0 },
+            { id: 6, question: "What does loss aversion describe?", options: ["A) The preference of avoiding losses over acquiring equivalent gains", "B) The tendency to lose money on purpose", "C) Joy experienced during economic crashes"], correct: 0 },
+            { id: 7, question: "What does 'Heuristic' mean in cognitive psychology?", options: ["A) A complex mathematical formula", "B) A practical mental shortcut for problem-solving", "C) A permanent brain injury"], correct: 1 },
+            { id: 8, question: "What is 'Exuberance' associated with in market contexts?", options: ["A) Extreme pessimism and panic", "B) Over-optimism and inflated asset values", "C) Absolute regulatory silence"], correct: 1 },
+            { id: 9, question: "What do institutional safeguards aim to mitigate?", options: ["A) Systemic economic volatility and irrationality", "B) Scientific research funding", "C) Technological innovation"], correct: 0 },
+            { id: 10, question: "What is the core conclusion of the passage?", options: ["A) Human rationality is flawless", "B) Biases skew decisions, making awareness and safeguards essential", "C) Economics has no relation to psychology"], correct: 1 }
+          ]
+        };
+      case "C2":
+      default:
+        return {
+          title: `Day ${day}: Epistemological Frameworks in Post-Modern Philosophical Discourse`,
+          text: `Contemporary epistemology is characterized by an intricate deconstruction of foundationalist paradigms, ushering in an era of pluralistic justification models and radical contextualism. Philosophers scrutinize the demarcation criteria between empirical validation and socially constructed reality, questioning the ontological status of objective truth in hyper-mediated environments. As hermeneutic circles intersect with analytical philosophy, the traditional tripartite definition of knowledge—justified true belief—faces rigorous scrutiny from Gettier-type counterexamples and pragmatic skepticism. Navigating these labyrinthine intellectual terrains demands an uncompromising commitment to rigorous dialectical analysis, transcending dogmatic assertions to embrace a nuanced, self-correcting appreciation of human intellect and its inherent interpretive limitations.`,
+          vocabulary: [
+            { term: "Epistemology", def: "The philosophical study of the nature, origin, and limits of human knowledge." },
+            { term: "Ontological", def: "Relating to the branch of metaphysics dealing with the nature of being." },
+            { term: "Dialectical", def: "Relating to the logical discussion of ideas and opinions." }
           ],
-          correct: 0
-        },
-        {
-          id: 7,
-          question: "What does the term 'Paradigm' mean based on the vocabulary section?",
-          options: [
-            "A) A random mistake in a sentence",
-            "B) A typical example or pattern of something (model/framework)",
-            "C) A temporary digital platform"
-          ],
-          correct: 1
-        },
-        {
-          id: 8,
-          question: "What is defined as 'The mental ability to switch between thinking about two different concepts'?",
-          options: [
-            "A) Cognitive flexibility",
-            "B) Passive memorization",
-            "C) Authorial tone"
-          ],
-          correct: 0
-        },
-        {
-          id: 9,
-          question: "What does 'Cohesion' refer to in written or spoken text?",
-          options: [
-            "A) The speed of reading words per minute",
-            "B) The action or fact of forming a united whole",
-            "C) The volume of audio playback"
-          ],
-          correct: 1
-        },
-        {
-          id: 10,
-          question: "What is the ultimate goal of moving beyond superficial interpretation?",
-          options: [
-            "A) Achieving advanced global perspective and profound text mastery",
-            "B) Finishing the exercise as quickly as possible",
-            "C) Ignoring transitional markers"
-          ],
-          correct: 0
-        }
-      ]
-    };
+          questions: [
+            { id: 1, question: "What characterizes contemporary epistemology according to the text?", options: ["A) Strict adherence to ancient dogmas", "B) Deconstruction of foundationalist paradigms and pluralistic justification", "C) Complete abandonment of logic"], correct: 1 },
+            { id: 2, question: "What do philosophers scrutinize in hyper-mediated environments?", options: ["A) The demarcation between empirical validation and constructed reality", "B) Digital file compression formats", "C) Elementary school curriculum"], correct: 0 },
+            { id: 3, question: "What traditional definition of knowledge faces rigorous scrutiny?", options: ["A) Memorized factual data", "B) The tripartite definition of justified true belief", "C) Empirical mathematics"], correct: 1 },
+            { id: 4, question: "What kind of counterexamples challenge standard knowledge definitions?", options: ["A) Gettier-type counterexamples", "B) Algebraic equations", "C) Statistical outliers"], correct: 0 },
+            { id: 5, question: "What does navigating labyrinthine intellectual terrains demand?", options: ["A) Uncompromising commitment to rigorous dialectical analysis", "B) Superficial reading habits", "C) Dogmatic acceptance of theories"], correct: 0 },
+            { id: 6, question: "What is the primary focus of 'Epistemology'?", options: ["A) The study of physical universe origins", "B) The nature, origin, and limits of human knowledge", "C) The laws of planetary motion"], correct: 1 },
+            { id: 7, question: "What does 'Ontological' relate to?", options: ["A) The nature of being and existence", "B) The financial cost of books", "C) The structure of computer languages"], correct: 0 },
+            { id: 8, question: "What is 'Dialectical analysis'?", options: ["A) Logical discussion and critical examination of ideas", "B) Translating texts between languages", "C) Memorizing historical dates"], correct: 0 },
+            { id: 9, question: "How does the passage view human interpretive limitations?", options: ["A) As something to be embraced with a self-correcting appreciation", "B) As flaws that can be permanently eradicated", "C) As irrelevant to philosophy"], correct: 0 },
+            { id: 10, question: "What is the overarching theme of this advanced discourse?", options: ["A) The complexity and shifting nature of knowledge justification", "B) The simplicity of everyday communication", "C) The history of printing presses"], correct: 0 }
+          ]
+        };
+    }
   };
 
-  const currentData = getDayContent(activeDay);
+  const currentData = getDayContent(level, activeDay);
 
   const handleOptionSelect = (qId: number, optIndex: number) => {
     if (isSubmitted) return;
-    setSelectedAnswers({ ...selectedAnswers, [qId]: optIndex });
+    // Eğer istifadəçi artıq seçdiyi varianta bir də klikləyirsə, cavabı ləğv et (boşalt)
+    if (selectedAnswers[qId] === optIndex) {
+      const updated = { ...selectedAnswers };
+      delete updated[qId];
+      setSelectedAnswers(updated);
+    } else {
+      setSelectedAnswers({ ...selectedAnswers, [qId]: optIndex });
+    }
   };
 
   const handleSubmitTest = () => {
@@ -179,11 +210,10 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
   return (
     <main className="min-h-screen bg-slate-950 text-white p-6 md:p-16 font-sans">
       <div className="max-w-7xl mx-auto space-y-12">
-        
         <div className="flex justify-between items-center bg-slate-900 p-6 rounded-3xl border border-white/10 shadow-xl">
           <Link href="/" className="text-blue-400 font-bold hover:underline text-sm">← Main Menu</Link>
           <h1 className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
-            {level} Level • Reading Module (Cathoven & TED-Ed Style)
+            {level} Level • Reading Module
           </h1>
         </div>
 
@@ -215,7 +245,7 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
               </div>
 
               <div className="bg-slate-950/60 p-6 rounded-2xl border border-white/5 space-y-3">
-                <h3 className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider">Advanced Vocabulary & Expressions:</h3>
+                <h3 className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider">Vocabulary & Expressions:</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {currentData.vocabulary.map((vocab, idx) => (
                     <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/5 text-xs space-y-1">
@@ -229,8 +259,8 @@ export default function ReadingLevelPage({ params }: { params: Promise<{ level: 
 
             <div className="p-8 bg-slate-900 rounded-3xl border border-white/10 space-y-8 shadow-2xl">
               <div className="border-b border-white/10 pb-4">
-                <h3 className="text-xl font-bold">Comprehensive 10-Question Test</h3>
-                <p className="text-xs text-gray-400 mt-1">You need at least 7 correct answers to unlock the next day.</p>
+                <h3 className="text-xl font-bold">10-Question Reading Test</h3>
+                <p className="text-xs text-gray-400 mt-1">You need at least 7 correct answers to unlock the next day. (Click selected option again to deselect).</p>
               </div>
 
               <div className="space-y-6">
