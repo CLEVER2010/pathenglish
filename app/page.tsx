@@ -1,215 +1,241 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
-export default function ProfessionalLandingPage() {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const router = useRouter();
+interface User {
+  username: string
+  email: string
+  password: string
+}
 
-    const handleStartTest = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!name.trim() || !email.trim()) {
-            alert('Zəhmət olmasa adınızı və e-poçt ünvanınızı daxil edin.');
-            return;
-        }
-        localStorage.setItem('userName', name);
-        localStorage.setItem('userEmail', email);
-        // Birbaşa imtahan səhifəsinə yönləndirmə (məsələn, qrammatika / səviyyə testinə)
-        router.push('/exam/beginner');
-    };
+export default function Home() {
+  const router = useRouter()
+  
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('register')
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
 
-    return (
-        <div style={{
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-            backgroundColor: '#0b132b',
-            color: '#ffffff',
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between'
-        }}>
-            {/* Header */}
-            <header style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '20px 50px',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                backgroundColor: '#0b132b'
-            }}>
-                <div style={{ fontSize: '22px', fontWeight: '800', letterSpacing: '-0.5px' }}>
-                    PathEnglish.<span style={{ color: '#ef4444' }}>Az</span>
-                </div>
-                <div style={{ display: 'flex', gap: '25px', alignItems: 'center', fontSize: '14px', color: '#94a3b8' }}>
-                    <span style={{ cursor: 'pointer' }}>Tests</span>
-                    <span style={{ cursor: 'pointer' }}>Certificate</span>
-                    <span style={{ cursor: 'pointer' }}>Practice</span>
-                    <div style={{
-                        backgroundColor: '#ef4444',
-                        color: 'white',
-                        padding: '8px 18px',
-                        borderRadius: '6px',
-                        fontWeight: '600',
-                        cursor: 'pointer'
-                    }}>
-                        Start Test
-                    </div>
-                </div>
-            </header>
+  const handleAuthSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setErrorMsg('')
 
-            {/* Hero Section */}
-            <main style={{
-                maxWidth: '1100px',
-                margin: '40px auto',
-                padding: '0 20px',
-                display: 'grid',
-                gridTemplateColumns: '1.2fr 0.8fr',
-                gap: '50px',
-                alignItems: 'center'
-            }}>
-                {/* Left Side: Information & Credibility */}
-                <div>
-                    <div style={{
-                        display: 'inline-block',
-                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                        color: '#ef4444',
-                        padding: '6px 14px',
-                        borderRadius: '20px',
-                        fontSize: '13px',
-                        fontWeight: '700',
-                        marginBottom: '20px',
-                        letterSpacing: '0.5px'
-                    }}>
-                        BEYNƏLXALQ STANDARTLAR
-                    </div>
-                    <h1 style={{
-                        fontSize: '44px',
-                        lineHeight: '1.2',
-                        fontWeight: '800',
-                        marginBottom: '20px',
-                        color: '#f8fafc'
-                    }}>
-                        İngilis Dili Səviyyənizi Təsdiqləyin və <span style={{ color: '#ef4444' }}>Sertifikat</span> Alın
-                    </h1>
-                    <p style={{
-                        color: '#94a3b8',
-                        fontSize: '16px',
-                        lineHeight: '1.6',
-                        marginBottom: '30px'
-                    }}>
-                        CEFR standartlarına uyğun peşəkar yerləşdirmə imtahanı verərək real dil bil патологію (biliyinizi) yoxlayın. İmtahanı uğurla tamamlayan namizədlərə rəsmi rəqəmsal sertifikat **tamamilə pulsuz** təqdim olunur.
-                    </p>
+    const cleanEmail = email.trim().toLowerCase()
+    const cleanUsername = username.trim()
+    const cleanPassword = password.trim()
 
-                    <div style={{ display: 'flex', gap: '30px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
-                        <div>
-                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#fff' }}>15,000+</div>
-                            <div style={{ fontSize: '13px', color: '#94a3b8' }}>Aktiv Tələbə</div>
-                        </div>
-                        <div>
-                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#fff' }}>CEFR</div>
-                            <div style={{ fontSize: '13px', color: '#94a3b8' }}>Beynəlxalq Uyğunluq</div>
-                        </div>
-                        <div>
-                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#22c55e' }}>0 AZN</div>
-                            <div style={{ fontSize: '13px', color: '#94a3b8' }}>Sertifikat Haqqı</div>
-                        </div>
-                    </div>
-                </div>
+    if (authMode === 'register') {
+      if (!cleanUsername || !cleanEmail || !cleanPassword) {
+        setErrorMsg('Lütfən bütün xanaları (Username, Email, Şifrə) doldurun!')
+        return
+      }
+    } else {
+      if (!cleanEmail || !cleanPassword) {
+        setErrorMsg('Lütfən Email və Şifrənizi daxil edin!')
+        return
+      }
+    }
 
-                {/* Right Side: Professional Login / Registration Box */}
-                <div style={{
-                    backgroundColor: '#111c44',
-                    padding: '35px',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)'
-                }}>
-                    <h3 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '8px', color: '#fff' }}>
-                        İmtahana Giriş
-                    </h3>
-                    <p style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '25px' }}>
-                        Nəticələriniz və sertifikatınız üçün məlumatlarınızı daxil edin.
-                    </p>
+    const users: User[] = JSON.parse(localStorage.getItem('pe_users') || '[]')
 
-                    <form onSubmit={handleStartTest}>
-                        <div style={{ marginBottom: '18px' }}>
-                            <label style={{ display: 'block', fontSize: '13px', color: '#cbd5e1', marginBottom: '6px', fontWeight: '600' }}>
-                                Ad və Soyad
-                            </label>
-                            <input
-                                type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Məsələn: Leyla Məmmədova"
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 14px',
-                                    backgroundColor: '#0b132b',
-                                    border: '1px solid #334155',
-                                    borderRadius: '6px',
-                                    color: '#fff',
-                                    fontSize: '15px',
-                                    outline: 'none'
-                                }}
-                            />
-                        </div>
+    if (authMode === 'register') {
+      const existingUser = users.find(
+        (u) => u.email.toLowerCase() === cleanEmail || u.username.toLowerCase() === cleanUsername.toLowerCase()
+      )
 
-                        <div style={{ marginBottom: '25px' }}>
-                            <label style={{ display: 'block', fontSize: '13px', color: '#cbd5e1', marginBottom: '6px', fontWeight: '600' }}>
-                                Elektron Poçt (Email)
-                            </label>
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="ornek@domain.com"
-                                style={{
-                                    width: '100%',
-                                    padding: '12px 14px',
-                                    backgroundColor: '#0b132b',
-                                    border: '1px solid #334155',
-                                    borderRadius: '6px',
-                                    color: '#fff',
-                                    fontSize: '15px',
-                                    outline: 'none'
-                                }}
-                            />
-                        </div>
+      if (existingUser) {
+        setErrorMsg('Bu Email və ya Username ilə artıq qeydiyyat olunub! Lütfən "Daxil olun" düyməsinə sıxın.')
+        return
+      }
 
-                        <button
-                            type="submit"
-                            style={{
-                                width: '100%',
-                                padding: '14px',
-                                backgroundColor: '#dc2626',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '16px',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                transition: 'background 0.2s',
-                                boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)'
-                            }}
-                        >
-                            İmtahana İndi Başla 🚀
-                        </button>
-                    </form>
-                </div>
-            </main>
+      const newUser: User = {
+        username: cleanUsername,
+        email: cleanEmail,
+        password: cleanPassword
+      }
 
-            {/* Footer */}
-            <footer style={{
-                textAlign: 'center',
-                padding: '20px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                color: '#64748b',
-                fontSize: '13px'
-            }}>
-                &copy; 2026 PathEnglish.Az. Bütün hüquqlar qorunur. Beynəlxalq Dil Testi Platforması.
-            </footer>
+      users.push(newUser)
+      localStorage.setItem('pe_users', JSON.stringify(users))
+      localStorage.setItem('pe_session', JSON.stringify(newUser))
+
+      router.push('/reading')
+
+    } else {
+      // CİDDİ PAROL YOXLANIŞI - SƏHV İSƏ GİRİŞ QƏTİYYƏN MÜMKÜN DEYİL
+      const foundUser = users.find(
+        (u) => (u.email.toLowerCase() === cleanEmail || u.username.toLowerCase() === cleanEmail) && u.password === cleanPassword
+      )
+
+      if (!foundUser) {
+        setErrorMsg('DİQQƏT: Giriş uğursuzdur! Şifrə və ya Email yanlışdır.')
+        return
+      }
+
+      localStorage.setItem('pe_session', JSON.stringify(foundUser))
+      router.push('/reading')
+    }
+  }
+
+  const scrollToAuth = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0a0f1d] text-white flex flex-col font-sans">
+      <header className="w-full border-b border-slate-800/80 bg-[#0a0f1d]/90 backdrop-blur sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/')}>
+            <span className="text-2xl font-black tracking-tight text-white">
+              PathEnglish<span className="text-red-500">.Az</span>
+            </span>
+          </div>
+
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+            <button onClick={scrollToAuth} className="hover:text-white transition cursor-pointer">Tests</button>
+            <button onClick={scrollToAuth} className="hover:text-white transition cursor-pointer">Certificate</button>
+            <button onClick={scrollToAuth} className="hover:text-white transition cursor-pointer">Practice</button>
+          </nav>
+
+          <button
+            onClick={scrollToAuth}
+            className="bg-red-500 hover:bg-red-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition shadow-lg shadow-red-500/20 cursor-pointer"
+          >
+            Start Test
+          </button>
         </div>
-    );
+      </header>
+
+      <main className="flex-1 max-w-7xl mx-auto px-6 py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        <div className="lg:col-span-7 space-y-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold tracking-wider uppercase">
+            BEYNƏLXALQ STANDARTLAR
+          </div>
+
+          <h1 className="text-4xl md:text-6xl font-black leading-tight text-white">
+            İngilis Dili Səviyyənizi Təsdiqləyin və <span className="text-red-500">Sertifikat</span> Alın
+          </h1>
+
+          <p className="text-slate-400 text-base md:text-lg leading-relaxed max-w-2xl">
+            CEFR standartlarına uyğun peşəkar yerləşdirmə imtahanı verərək real dil biliklərinizi yoxlayın. İmtahanı uğurla tamamlayan namizədlərə rəsmi rəqəmsal sertifikat <strong className="text-white">tamamilə pulsuz</strong> təqdim olunur.
+          </p>
+
+          <div className="pt-6 grid grid-cols-3 gap-6 border-t border-slate-800 max-w-lg">
+            <div>
+              <div className="text-3xl font-black text-white">1,000+</div>
+              <div className="text-xs text-slate-400 font-medium mt-1">Aktiv Tələbə</div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-emerald-400">CEFR</div>
+              <div className="text-xs text-slate-400 font-medium mt-1">Beynəlxalq Uyğunluq</div>
+            </div>
+            <div>
+              <div className="text-3xl font-black text-emerald-400">0 AZN</div>
+              <div className="text-xs text-slate-400 font-medium mt-1">Sertifikat Haqqı</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="lg:col-span-5 w-full">
+          <div className="bg-[#111827] border border-slate-800 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+            
+            <div className="text-center mb-6">
+              <span className="inline-block px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold tracking-widest rounded-full uppercase mb-2">
+                PATHENGLISH.AZ
+              </span>
+              <h2 className="text-2xl font-bold text-white">
+                {authMode === 'register' ? 'İmtahana Qeydiyyat' : 'Xoş Gəlmisiniz'}
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">
+                {authMode === 'register' 
+                  ? 'Nəticələriniz və sertifikatınız üçün məlumatlarınızı daxil edin.' 
+                  : 'Hesabınıza daxil olaraq testə davam edin.'}
+              </p>
+            </div>
+
+            {errorMsg && (
+              <div className="mb-4 p-3 bg-red-500/20 border border-red-500 text-red-300 text-xs font-bold rounded-xl text-center">
+                ⚠️ {errorMsg}
+              </div>
+            )}
+
+            <form onSubmit={handleAuthSubmit} className="space-y-4">
+              
+              {authMode === 'register' && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">İstifadəçi Adı (Username)</label>
+                  <input
+                    type="text"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Məsələn: Əli Həsənov"
+                    className="w-full bg-[#0a0f1d] border border-slate-700 focus:border-emerald-500 text-white rounded-xl px-4 py-3 text-sm outline-none transition"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Elektron Poçt (Gmail/Email)</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="ornek@gmail.com"
+                  className="w-full bg-[#0a0f1d] border border-slate-700 focus:border-emerald-500 text-white rounded-xl px-4 py-3 text-sm outline-none transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Şifrə (Password)</label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-[#0a0f1d] border border-slate-700 focus:border-emerald-500 text-white rounded-xl px-4 py-3 text-sm outline-none transition"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-emerald-600/20 mt-2 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {authMode === 'register' ? 'QEYDİYYATDAN KEÇ VƏ BAŞLA 🚀' : 'DAXİL OL 🚀'}
+              </button>
+            </form>
+
+            <div className="mt-6 text-center">
+              {authMode === 'register' ? (
+                <p className="text-xs text-slate-400">
+                  Artıq hesabınız var?{' '}
+                  <button
+                    onClick={() => { setAuthMode('login'); setErrorMsg(''); }}
+                    className="text-emerald-400 font-bold hover:underline cursor-pointer"
+                  >
+                    Daxil olun
+                  </button>
+                </p>
+              ) : (
+                <p className="text-xs text-slate-400">
+                  Hesabınız yoxdur?{' '}
+                  <button
+                    onClick={() => { setAuthMode('register'); setErrorMsg(''); }}
+                    className="text-emerald-400 font-bold hover:underline cursor-pointer"
+                  >
+                    Qeydiyyatdan keçin
+                  </button>
+                </p>
+              )}
+            </div>
+
+          </div>
+        </div>
+      </main>
+    </div>
+  )
 }
