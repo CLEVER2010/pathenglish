@@ -1,2 +1,40 @@
-import { GoogleGenerativeAI } from "@google/generative-ai"; const genAI = new GoogleGenerativeAI(process.env.
-    GEMINI_API_KEY!); export async function POST(req: Request) { try { const { level, topic, minutes } = await req.json(); const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", }); const prompt = `Write a ${level} English reading article about ${topic}. Length: about ${minutes * 80} words. Style: BBC Learning English. Return only JSON with title and content.`; const result = await model.generateContent(prompt); return Response.json({ success: true, text: result.response.text(), }); } catch (error: any) { return Response.json( { success: false, error: error.message, }, { status: 500 } ); } } export async function GET() { return Response.json({ success: true, message: "PathEnglish AI API is ready", }); }
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+export async function GET() {
+  return Response.json({
+    success: true,
+    message: "PathEnglish AI API is ready",
+  });
+}
+
+export async function POST(req: Request) {
+  try {
+    const { level, topic, minutes } = await req.json();
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash-lite",
+    });
+
+    const prompt = `Write a ${level} English reading article about ${topic}.
+Length: about ${minutes * 80} words.
+Style: BBC Learning English.
+Return only JSON with title and content.`;
+
+    const result = await model.generateContent(prompt);
+
+    return Response.json({
+      success: true,
+      text: result.response.text(),
+    });
+  } catch (error: any) {
+    return Response.json(
+      {
+        success: false,
+        error: error.message,
+      },
+      { status: 500 }
+    );
+  }
+}
