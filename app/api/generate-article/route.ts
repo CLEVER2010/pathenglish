@@ -1,60 +1,106 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createClient } from "@supabase/supabase-js";
 
-export async function GET(request: Request) {
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export async function POST(req: Request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { level, topic, minutes } = await req.json();
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `
+Create a ${level} English reading article about ${topic}.
+Length: approximately ${minutes * 80} words.
+
+Return ONLY valid JSON in this format:
+
+{
+  "title": "...",
+  "content": "...",
+  "summary": "...",
+  "vocabulary": [
+    {"word":"...","meaning":"...","example":"..."}
+  ],
+  "questions": [
+    {
+      "question":"...",
+      "a":"...",
+      "b":"...",
+      "c":"...",
+      "d":"...",
+      "correct":"A"
     }
+  ]
+}
+`;
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const geminiKey = process.env.GEMINI_API_KEY;
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
 
-    if (!supabaseUrl || !supabaseKey || !geminiKey) {
-      return NextResponse.json({ error: 'Missing environment variables' }, { status: 500 });
-    }
+    const cleaned = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const levels = ['A1', 'A2', 'B1', 'B2', 'C1'];
-    const results = [];
+    const data = JSON.parse(cleaned);
 
-    for (const level of levels) {
-      const prompt = `Create an English reading article for CEFR level ${level} about science or nature. Return strictly a valid JSON object with keys: title, content (150 words), source ("PathEnglish AI"), and questions (array with question, options array, answer). No markdown formatting like json.`;
+    const { data: article, error: articleError } = await supabase
+      .from("articles")
+      .insert({
+        level,
+        topic,
+        title: data.title,
+        content: data.content,
+        summary: data.summary,
+        reading_time: minutes,
+      })
+      .select()
+      .single();
 
-      const geminiRes = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        }
+    if (articleError) throw articleError;
+
+    if (data.vocabulary?.length) {
+      await supabase.from("vocabulary").insert(
+        data.vocabulary.map((v: any) => ({
+          article_id: article.id,
+          word: v.word,
+          meaning: v.meaning,
+          example: v.example,
+        }))
       );
-
-      const geminiData = await geminiRes.json();
-      const responseText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
-      
-      if (!responseText) continue;
-
-      const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-      const articleData = JSON.parse(cleanedText);
-
-      await supabase.from('articles').insert({
-        level: level,
-        title: articleData.title,
-        content: articleData.content,
-        source: articleData.source,
-        questions: articleData.questions,
-      });
-
-      results.push(level);
     }
 
-    return NextResponse.json({ success: true, results });
+    if (data.questions?.length) {
+      await supabase.from("questions").insert(
+        data.questions.map((q: any) => ({
+          article_id: article.id,
+          question: q.question,
+          option_a: q.a,
+          option_b: q.b,
+          option_c: q.c,
+          option_d: q.d,
+          correct_option: q.correct,
+        }))
+      );
+    }
+
+    return Response.json({
+      success: true,
+      article,
+    });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return Response.json(
+      {
+        success: false,
+        error: error.message,
+      },
+      { status: 500 }
+    );
   }
 }
