@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { GoogleGenAI } from '@google/genai';
 
-// Supabase müştərisi
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Gemini SDK
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export async function GET(request: Request) {
-  // Cron təhlükəsizlik yoxlanışı
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -23,7 +17,6 @@ export async function GET(request: Request) {
     const results = [];
 
     for (const level of levels) {
-      // Gemini-yə göndəriləcək təlimat (Prompt)
       const prompt = `
         You are an expert English language teacher and content creator. 
         Create an engaging English reading article suitable for CEFR level ${level}.
@@ -44,20 +37,26 @@ export async function GET(request: Request) {
         }
       `;
 
-      // Gemini modelini çağırırıq
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-      });
+      // Birbaşa Google Gemini REST API-ə fetch sorğusu göndəririk (heç bir paket tələb etmir)
+      const geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        }
+      );
 
-      const responseText = response.text;
+      const geminiData = await geminiRes.json();
+      const responseText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+      
       if (!responseText) continue;
 
-      // JSON formatını təmizləyib obyektə çeviririk
       const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
       const articleData = JSON.parse(cleanedText);
 
-      // Supabase bazasına yazırıq
       const { error } = await supabase.from('articles').insert({
         level: level,
         title: articleData.title,
