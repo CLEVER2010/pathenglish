@@ -17,27 +17,8 @@ export async function GET(request: Request) {
     const results = [];
 
     for (const level of levels) {
-      const prompt = `
-        You are an expert English language teacher and content creator. 
-        Create an engaging English reading article suitable for CEFR level ${level}.
-        The topic can be science, nature, technology, or culture (inspired by BBC or National Geographic).
-        
-        You MUST return the response strictly as a valid JSON object with the following keys, and nothing else (no markdown formatting like \`\`\`json):
-        {
-          "title": "Article title in English",
-          "content": "Full article text in English (around 150-200 words)",
-          "source": "PathEnglish AI",
-          "questions": [
-            {
-              "question": "Multiple choice question based on the text?",
-              "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
-              "answer": "Correct option letter or text"
-            }
-          ]
-        }
-      `;
+      const prompt = `Create an English reading article for CEFR level ${level} about science or nature. Return strictly a valid JSON object with keys: title, content (150 words), source ("PathEnglish AI"), and questions (array with question, options array, answer). No markdown formatting like json.`;
 
-      // Birbaşa Google Gemini REST API-ə fetch sorğusu göndəririk (heç bir paket tələb etmir)
       const geminiRes = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
         {
@@ -57,7 +38,7 @@ export async function GET(request: Request) {
       const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
       const articleData = JSON.parse(cleanedText);
 
-      const { error } = await supabase.from('articles').insert({
+      await supabase.from('articles').insert({
         level: level,
         title: articleData.title,
         content: articleData.content,
@@ -65,16 +46,11 @@ export async function GET(request: Request) {
         questions: articleData.questions,
       });
 
-      if (error) throw error;
       results.push(level);
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: `AI uğurla ${results.join(', ')} səviyyələri üçün mətnlər yaratdı və bazaya yazdı!` 
-    });
-
-  } catch (error) {
-    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 });
+    return NextResponse.json({ success: true, results });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
